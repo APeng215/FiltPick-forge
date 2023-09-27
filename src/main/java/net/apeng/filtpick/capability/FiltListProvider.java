@@ -33,11 +33,11 @@ public class FiltListProvider implements ICapabilitySerializable<CompoundTag> {
 
     @Override
     public CompoundTag serializeNBT() {
-        return filtList.serializeNBT();
+        return getFiltList().serializeNBT();
     }
 
     @Override
     public void deserializeNBT(CompoundTag nbt) {
-        filtList.deserializeNBT(nbt);
+        getFiltList().deserializeNBT(nbt);
     }
 }

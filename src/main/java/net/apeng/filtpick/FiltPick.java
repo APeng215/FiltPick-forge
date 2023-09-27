@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 public class FiltPick {
     public static final String MOD_ID = "filtpick";
     public static final FiltList CLIENT_FILT_LIST = new FiltList(27);
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
 
 
     public FiltPick() {

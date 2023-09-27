@@ -26,7 +26,6 @@ public class ClientEvents {
             if (event.phase == TickEvent.Phase.END) { // Only call code once as the tick event is called twice every tick
                 while (KeyBinding.OPEN_FILTLIST_MAP.consumeClick()) {
                     // Execute logic to perform on click here
-
                     NetWorkHandler.sendToServer(new OpenFiltScreenC2SPacket());
                 }
                 while (KeyBinding.SET_ITEM_MAP.consumeClick()) {

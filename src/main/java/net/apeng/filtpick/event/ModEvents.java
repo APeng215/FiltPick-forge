@@ -62,14 +62,10 @@ public class ModEvents {
 
     @SubscribeEvent
     public static void deathPersisting(PlayerEvent.Clone event) {
-        if (event.isWasDeath()) {
-            Player oldPlayer = event.getOriginal();
-            oldPlayer.reviveCaps();
-
-            oldPlayer.getCapability(FiltListProvider.FILT_LIST).ifPresent(oldList -> event.getEntity().getCapability(FiltListProvider.FILT_LIST).ifPresent(newList -> newList.copyFrom(oldList)));
-
-            oldPlayer.invalidateCaps();
-        }
+        Player oldPlayer = event.getOriginal();
+        oldPlayer.reviveCaps();
+        oldPlayer.getCapability(FiltListProvider.FILT_LIST).ifPresent(oldList -> event.getEntity().getCapability(FiltListProvider.FILT_LIST).ifPresent(newList -> newList.copyFrom(oldList)));
+        oldPlayer.invalidateCaps();
     }
 
 

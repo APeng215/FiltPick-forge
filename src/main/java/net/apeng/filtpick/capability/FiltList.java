@@ -1,5 +1,6 @@
 package net.apeng.filtpick.capability;
 
+import net.apeng.filtpick.util.TypeTranslator;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.common.capabilities.AutoRegisterCapability;
 import net.minecraftforge.items.ItemStackHandler;
@@ -23,12 +24,28 @@ public class FiltList extends ItemStackHandler {
         this.whitelistModeOn = whitelistModeOn;
     }
 
+    public int isWhitelistModeOnInt() {
+        return TypeTranslator.boolToInt(whitelistModeOn);
+    }
+
+    public void setWhitelistModeOnInt(int whitelistModeOn) {
+        this.whitelistModeOn = TypeTranslator.intToBool(whitelistModeOn);
+    }
+
     public boolean isDestructionModeOn() {
         return destructionModeOn;
     }
 
     public void setDestructionModeOn(boolean destructionModeOn) {
         this.destructionModeOn = destructionModeOn;
+    }
+
+    public int isDestructionModeOnInt() {
+        return TypeTranslator.boolToInt(destructionModeOn);
+    }
+
+    public void setDestructionModeOnInt(int destructionModeOn) {
+        this.destructionModeOn = TypeTranslator.intToBool(destructionModeOn);
     }
 
     public void copyFrom(FiltList source) {

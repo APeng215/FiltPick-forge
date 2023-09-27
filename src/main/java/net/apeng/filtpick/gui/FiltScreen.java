@@ -2,14 +2,17 @@ package net.apeng.filtpick.gui;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.apeng.filtpick.FiltPick;
+import net.minecraft.client.gui.components.StateSwitchingButton;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 public class FiltScreen extends AbstractContainerScreen<FiltMenu> {
-
     public static final ResourceLocation BACKGROUND_LOCATION = new ResourceLocation("textures/gui/container/shulker_box.png");
+    public static final ResourceLocation MOD_BUTTON_TEXTURE_LOCATION = new ResourceLocation(FiltPick.MOD_ID, "textures/guis/filtpick_mode_button.png");
+    private StateSwitchingButton modeButton;
 
     public FiltScreen(FiltMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
@@ -21,6 +24,17 @@ public class FiltScreen extends AbstractContainerScreen<FiltMenu> {
     @Override
     protected void init() {
         super.init();
+
+        modeButton = new StateSwitchingButton(
+                this.leftPos + 5,
+                this.topPos + 5,
+                12,
+                12,
+                false
+        );
+        modeButton.initTextureValues(0, 0, 16, 16, MOD_BUTTON_TEXTURE_LOCATION);
+        // Add widgets and precomputed values
+        this.addRenderableWidget(modeButton);
 
     }
 
@@ -54,5 +68,14 @@ public class FiltScreen extends AbstractContainerScreen<FiltMenu> {
          * integer u/v coordinates inside the 256 x 256 PNG file.
          */
         this.blit(pose, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
+    }
+
+    @Override
+    public boolean mouseClicked(double p_97748_, double p_97749_, int p_97750_) {
+        if (modeButton.mouseClicked(p_97748_, p_97749_, p_97750_)) {
+            modeButton.setStateTriggered(!modeButton.isStateTriggered());
+        }
+
+        return super.mouseClicked(p_97748_, p_97749_, p_97750_);
     }
 }
