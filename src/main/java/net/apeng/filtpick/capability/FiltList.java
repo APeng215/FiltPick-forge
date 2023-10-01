@@ -68,8 +68,8 @@ public class FiltList extends ItemStackHandler {
     @Override
     public void deserializeNBT(CompoundTag nbt) {
         super.deserializeNBT(nbt);
-        this.whitelistModeOn = nbt.getBoolean("WhitelistModeOn");
-        this.destructionModeOn = nbt.getBoolean("DestructionModeOn");
+        this.whitelistModeOn = nbt.getBoolean("whitelistModeOn");
+        this.destructionModeOn = nbt.getBoolean("destructionModeOn");
     }
 
 }

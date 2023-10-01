@@ -22,16 +22,14 @@ public class FiltMenu extends AbstractContainerMenu {
     public static final RegistryObject<MenuType<FiltMenu>> MENU_TYPE = REGISTER.register("filt_screen", () -> IForgeMenuType.create(FiltMenu::new));
     // Client menu constructor
     public FiltMenu(int containerId, Inventory playerInventory, FriendlyByteBuf buf) {
-        this(containerId, playerInventory, new ItemStackHandler(27), new SimpleContainerData(2));
+        this(containerId, playerInventory, new ItemStackHandler(27));
     }
 
     // Server menu constructor
-    public FiltMenu(int containerId, Inventory playerInventory, ItemStackHandler dataInventory, ContainerData dataMultiple) {
+    public FiltMenu(int containerId, Inventory playerInventory, ItemStackHandler dataInventory) {
         super(MENU_TYPE.get(), containerId);
         this.ghostInventory = dataInventory;
         this.playerInventory = playerInventory;
-        // Check if the data inventory size is some fixed value
-        checkContainerDataCount(dataMultiple, 2);
 
 
         // Add slots for player inventory
@@ -53,8 +51,6 @@ public class FiltMenu extends AbstractContainerMenu {
         }
 
 
-        // Add data slots for handled integers
-        this.addDataSlots(dataMultiple);
 
     }
 

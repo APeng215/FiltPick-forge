@@ -2,6 +2,7 @@ package net.apeng.filtpick.networking.packet;
 
 import net.apeng.filtpick.capability.FiltListProvider;
 import net.apeng.filtpick.gui.FiltMenu;
+import net.apeng.filtpick.networking.NetWorkHandler;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.SimpleMenuProvider;
@@ -26,14 +27,15 @@ public class OpenFiltScreenC2SPacket {
         NetworkEvent.Context context = supplier.get();
         context.enqueueWork(() -> context.getSender().getCapability(FiltListProvider.FILT_LIST).ifPresent(
                 serverFiltList -> {
+                    NetWorkHandler.sendToClient(new SynFiltListS2CPacket(serverFiltList), context.getSender());
+                }));
+        context.enqueueWork(() -> context.getSender().getCapability(FiltListProvider.FILT_LIST).ifPresent(
+                serverFiltList -> {
                     //Server Logic
-                    SimpleContainerData modes = new SimpleContainerData(2);
-                    modes.set(0, serverFiltList.isWhitelistModeOnInt());
-                    modes.set(1, serverFiltList.isDestructionModeOnInt());
                     NetworkHooks.openScreen(
                             context.getSender(),
                             new SimpleMenuProvider(
-                                    (containerId, playerInventory, player) -> new FiltMenu(containerId, playerInventory, serverFiltList, modes),
+                                    (containerId, playerInventory, player) -> new FiltMenu(containerId, playerInventory, serverFiltList),
                                     Component.translatable("menu.title.filtpick")
                             )
                     );

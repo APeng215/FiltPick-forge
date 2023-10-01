@@ -3,6 +3,8 @@ package net.apeng.filtpick.gui;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.apeng.filtpick.FiltPick;
+import net.apeng.filtpick.networking.NetWorkHandler;
+import net.apeng.filtpick.networking.packet.SynFiltListC2SPacket;
 import net.minecraft.client.gui.components.StateSwitchingButton;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -11,13 +13,15 @@ import net.minecraft.world.entity.player.Inventory;
 
 public class FiltScreen extends AbstractContainerScreen<FiltMenu> {
     public static final ResourceLocation BACKGROUND_LOCATION = new ResourceLocation("textures/gui/container/shulker_box.png");
-    public static final ResourceLocation MOD_BUTTON_TEXTURE_LOCATION = new ResourceLocation(FiltPick.MOD_ID, "textures/guis/filtpick_mode_button.png");
-    private StateSwitchingButton modeButton;
+    public static final ResourceLocation FILT_MOD_BUTTON_TEXTURE_LOCATION = new ResourceLocation(FiltPick.MOD_ID, "textures/guis/filtpick_mode_button.png");
+    public static final ResourceLocation DESTRUCTION_MOD_BUTTON_TEXTURE_LOCATION = new ResourceLocation(FiltPick.MOD_ID, "textures/guis/filtpick_destruction_on_button.png");
+
+    private StateSwitchingButton filtModeButton, destructionModeButton;
 
     public FiltScreen(FiltMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
 
-        this.titleLabelX = 10;
+        this.titleLabelX = 72;
         this.inventoryLabelX = 10;
     }
 
@@ -25,17 +29,28 @@ public class FiltScreen extends AbstractContainerScreen<FiltMenu> {
     protected void init() {
         super.init();
 
-        modeButton = new StateSwitchingButton(
-                this.leftPos + 5,
-                this.topPos + 5,
+        filtModeButton = new StateSwitchingButton(
+                this.leftPos + 7,
+                this.topPos + 4,
                 12,
                 12,
-                false
+                FiltPick.CLIENT_FILT_LIST.isWhitelistModeOn()
         );
-        modeButton.initTextureValues(0, 0, 16, 16, MOD_BUTTON_TEXTURE_LOCATION);
+        filtModeButton.initTextureValues(0, 0, 16, 16, FILT_MOD_BUTTON_TEXTURE_LOCATION);
         // Add widgets and precomputed values
-        this.addRenderableWidget(modeButton);
+        this.addRenderableWidget(filtModeButton);
 
+
+        destructionModeButton = new StateSwitchingButton(
+                this.leftPos + 7 + 13,
+                this.topPos + 4,
+                12,
+                12,
+                FiltPick.CLIENT_FILT_LIST.isDestructionModeOn()
+        );
+        destructionModeButton.initTextureValues(0, 0, 16, 16, DESTRUCTION_MOD_BUTTON_TEXTURE_LOCATION);
+        // Add widgets and precomputed values
+        this.addRenderableWidget(destructionModeButton);
     }
 
 
@@ -72,8 +87,15 @@ public class FiltScreen extends AbstractContainerScreen<FiltMenu> {
 
     @Override
     public boolean mouseClicked(double p_97748_, double p_97749_, int p_97750_) {
-        if (modeButton.mouseClicked(p_97748_, p_97749_, p_97750_)) {
-            modeButton.setStateTriggered(!modeButton.isStateTriggered());
+        if (filtModeButton.mouseClicked(p_97748_, p_97749_, p_97750_)) {
+            filtModeButton.setStateTriggered(!filtModeButton.isStateTriggered());
+            FiltPick.CLIENT_FILT_LIST.setWhitelistModeOn(!FiltPick.CLIENT_FILT_LIST.isWhitelistModeOn());
+            NetWorkHandler.sendToServer(new SynFiltListC2SPacket(FiltPick.CLIENT_FILT_LIST));
+        }
+        if (destructionModeButton.mouseClicked(p_97748_, p_97749_, p_97750_)) {
+            destructionModeButton.setStateTriggered(!destructionModeButton.isStateTriggered());
+            FiltPick.CLIENT_FILT_LIST.setDestructionModeOn(!FiltPick.CLIENT_FILT_LIST.isDestructionModeOn());
+            NetWorkHandler.sendToServer(new SynFiltListC2SPacket(FiltPick.CLIENT_FILT_LIST));
         }
 
         return super.mouseClicked(p_97748_, p_97749_, p_97750_);

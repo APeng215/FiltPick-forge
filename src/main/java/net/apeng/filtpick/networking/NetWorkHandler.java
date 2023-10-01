@@ -2,7 +2,9 @@ package net.apeng.filtpick.networking;
 
 import net.apeng.filtpick.FiltPick;
 import net.apeng.filtpick.networking.packet.OpenFiltScreenC2SPacket;
+import net.apeng.filtpick.networking.packet.SynFiltListAbstractPacket;
 import net.apeng.filtpick.networking.packet.SynFiltListC2SPacket;
+import net.apeng.filtpick.networking.packet.SynFiltListS2CPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkRegistry;
@@ -38,13 +40,20 @@ public class NetWorkHandler {
                 SynFiltListC2SPacket::new,
                 SynFiltListC2SPacket::handle
         );
+        INSTANCE.registerMessage(
+                id(),
+                SynFiltListS2CPacket.class,
+                SynFiltListS2CPacket::encode,
+                SynFiltListS2CPacket::new,
+                SynFiltListS2CPacket::handle
+        );
     }
 
     public static <MSG> void sendToServer(MSG message) {
         INSTANCE.sendToServer(message);
     }
 
-    public static <MSG> void sendToPlayer(MSG message, ServerPlayer player) {
+    public static <MSG> void sendToClient(MSG message, ServerPlayer player) {
         INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), message);
     }
 }

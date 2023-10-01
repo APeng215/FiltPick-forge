@@ -5,6 +5,7 @@ import net.apeng.filtpick.gui.FiltMenu;
 import net.apeng.filtpick.gui.FiltScreen;
 import net.apeng.filtpick.networking.NetWorkHandler;
 import net.apeng.filtpick.networking.packet.OpenFiltScreenC2SPacket;
+import net.apeng.filtpick.networking.packet.SynFiltListAbstractPacket;
 import net.apeng.filtpick.networking.packet.SynFiltListC2SPacket;
 import net.apeng.filtpick.util.KeyBinding;
 import net.minecraft.client.Minecraft;
