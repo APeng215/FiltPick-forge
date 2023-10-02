@@ -2,6 +2,7 @@ package net.apeng.filtpick.capability;
 
 import net.apeng.filtpick.util.TypeTranslator;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.AutoRegisterCapability;
 import net.minecraftforge.items.ItemStackHandler;
 
@@ -20,7 +21,7 @@ public class FiltList extends ItemStackHandler {
         return whitelistModeOn;
     }
 
-    public void setWhitelistModeOn(boolean whitelistModeOn) {
+    public void setWhitelistMode(boolean whitelistModeOn) {
         this.whitelistModeOn = whitelistModeOn;
     }
 
@@ -36,7 +37,7 @@ public class FiltList extends ItemStackHandler {
         return destructionModeOn;
     }
 
-    public void setDestructionModeOn(boolean destructionModeOn) {
+    public void setDestructionMode(boolean destructionModeOn) {
         this.destructionModeOn = destructionModeOn;
     }
 
@@ -56,6 +57,11 @@ public class FiltList extends ItemStackHandler {
         }
     }
 
+    public void copyModesFrom(FiltList source) {
+        this.whitelistModeOn = source.whitelistModeOn;
+        this.destructionModeOn = source.destructionModeOn;
+    }
+
 
     @Override
     public CompoundTag serializeNBT() {
@@ -70,6 +76,14 @@ public class FiltList extends ItemStackHandler {
         super.deserializeNBT(nbt);
         this.whitelistModeOn = nbt.getBoolean("whitelistModeOn");
         this.destructionModeOn = nbt.getBoolean("destructionModeOn");
+    }
+
+    public void reset() {
+        setWhitelistMode(false);
+        setDestructionMode(false);
+        for (int i = 0; i < this.getSlots(); i++) {
+            this.setStackInSlot(i, ItemStack.EMPTY);
+        }
     }
 
 }

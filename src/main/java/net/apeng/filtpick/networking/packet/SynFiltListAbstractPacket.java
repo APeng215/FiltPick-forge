@@ -1,6 +1,5 @@
 package net.apeng.filtpick.networking.packet;
 
-import net.apeng.filtpick.FiltPick;
 import net.apeng.filtpick.capability.FiltList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
@@ -15,8 +14,8 @@ public abstract class SynFiltListAbstractPacket {
     }
 
     public SynFiltListAbstractPacket(FriendlyByteBuf buf) {
-        filtList.setWhitelistModeOn(buf.readBoolean());
-        filtList.setDestructionModeOn(buf.readBoolean());
+        filtList.setWhitelistMode(buf.readBoolean());
+        filtList.setDestructionMode(buf.readBoolean());
         int slots = buf.readInt();
         for (int i = 0; i < slots; i++) {
             filtList.setStackInSlot(i, buf.readItem());
@@ -33,7 +32,7 @@ public abstract class SynFiltListAbstractPacket {
         }
     }
 
-    public abstract void handle(Supplier<NetworkEvent.Context> supplier);
+    public abstract void handler(Supplier<NetworkEvent.Context> supplier);
 
     public FiltList getFiltList() {
         return filtList;

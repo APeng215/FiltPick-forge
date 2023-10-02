@@ -2,8 +2,8 @@ package net.apeng.filtpick.networking;
 
 import net.apeng.filtpick.FiltPick;
 import net.apeng.filtpick.networking.packet.OpenFiltScreenC2SPacket;
-import net.apeng.filtpick.networking.packet.SynFiltListAbstractPacket;
-import net.apeng.filtpick.networking.packet.SynFiltListC2SPacket;
+import net.apeng.filtpick.networking.packet.ResetFiltListC2SPacket;
+import net.apeng.filtpick.networking.packet.SynFiltModesC2SPacket;
 import net.apeng.filtpick.networking.packet.SynFiltListS2CPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -35,17 +35,24 @@ public class NetWorkHandler {
         );
         INSTANCE.registerMessage(
                 id(),
-                SynFiltListC2SPacket.class,
-                SynFiltListC2SPacket::encode,
-                SynFiltListC2SPacket::new,
-                SynFiltListC2SPacket::handle
+                SynFiltModesC2SPacket.class,
+                SynFiltModesC2SPacket::encode,
+                SynFiltModesC2SPacket::new,
+                SynFiltModesC2SPacket::handler
         );
         INSTANCE.registerMessage(
                 id(),
                 SynFiltListS2CPacket.class,
                 SynFiltListS2CPacket::encode,
                 SynFiltListS2CPacket::new,
-                SynFiltListS2CPacket::handle
+                SynFiltListS2CPacket::handler
+        );
+        INSTANCE.registerMessage(
+                id(),
+                ResetFiltListC2SPacket.class,
+                ResetFiltListC2SPacket::encode,
+                ResetFiltListC2SPacket::new,
+                ResetFiltListC2SPacket::handler
         );
     }
 

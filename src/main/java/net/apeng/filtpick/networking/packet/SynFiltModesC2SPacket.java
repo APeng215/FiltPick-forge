@@ -8,25 +8,25 @@ import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class SynFiltListC2SPacket extends SynFiltListAbstractPacket {
+public class SynFiltModesC2SPacket extends SynFiltListAbstractPacket {
 
 
-    public SynFiltListC2SPacket(FiltList filtList) {
+    public SynFiltModesC2SPacket(FiltList filtList) {
         super(filtList);
     }
 
-    public SynFiltListC2SPacket(FriendlyByteBuf buf) {
+    public SynFiltModesC2SPacket(FriendlyByteBuf buf) {
         super(buf);
     }
 
 
-    public void handle(Supplier<NetworkEvent.Context> supplier) {
+    public void handler(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
         context.enqueueWork(() -> {
             context.getSender().getCapability(FiltListProvider.FILT_LIST).ifPresent(serverFiltList -> {
                 //Server Logic
-                serverFiltList.copyFrom(this.getFiltList());
-                context.getSender().sendSystemMessage(Component.literal("Syn filtlist completed"));
+                serverFiltList.copyModesFrom(this.getFiltList());
+                context.getSender().sendSystemMessage(Component.literal("Syn filtlist C2S completed"));
             });
         });
         context.setPacketHandled(true);

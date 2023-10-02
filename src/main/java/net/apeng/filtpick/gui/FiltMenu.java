@@ -4,7 +4,10 @@ import net.apeng.filtpick.FiltPick;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.*;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -19,7 +22,7 @@ public class FiltMenu extends AbstractContainerMenu {
     public static final DeferredRegister<MenuType<?>> REGISTER = DeferredRegister.create(ForgeRegistries.MENU_TYPES, FiltPick.MOD_ID);
     private final ItemStackHandler ghostInventory;
     private final Inventory playerInventory;
-    public static final RegistryObject<MenuType<FiltMenu>> MENU_TYPE = REGISTER.register("filt_screen", () -> IForgeMenuType.create(FiltMenu::new));
+
     // Client menu constructor
     public FiltMenu(int containerId, Inventory playerInventory, FriendlyByteBuf buf) {
         this(containerId, playerInventory, new ItemStackHandler(27));
@@ -51,8 +54,7 @@ public class FiltMenu extends AbstractContainerMenu {
         }
 
 
-
-    }
+    }    public static final RegistryObject<MenuType<FiltMenu>> MENU_TYPE = REGISTER.register("filt_screen", () -> IForgeMenuType.create(FiltMenu::new));
 
     protected boolean allowRepeats() {
         return false;

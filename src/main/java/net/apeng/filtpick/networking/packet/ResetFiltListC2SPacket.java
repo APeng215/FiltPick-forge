@@ -11,12 +11,11 @@ import net.minecraftforge.network.NetworkHooks;
 
 import java.util.function.Supplier;
 
-public class OpenFiltScreenC2SPacket {
-
-    public OpenFiltScreenC2SPacket() {
+public class ResetFiltListC2SPacket {
+    public ResetFiltListC2SPacket() {
     }
 
-    public OpenFiltScreenC2SPacket(FriendlyByteBuf buf) {
+    public ResetFiltListC2SPacket(FriendlyByteBuf buf) {
     }
 
     public void encode(FriendlyByteBuf buf) {
@@ -26,19 +25,10 @@ public class OpenFiltScreenC2SPacket {
         NetworkEvent.Context context = supplier.get();
         context.enqueueWork(() -> context.getSender().getCapability(FiltListProvider.FILT_LIST).ifPresent(
                 serverFiltList -> {
+                    serverFiltList.reset();
                     NetWorkHandler.sendToClient(new SynFiltListS2CPacket(serverFiltList), context.getSender());
                 }));
-        context.enqueueWork(() -> context.getSender().getCapability(FiltListProvider.FILT_LIST).ifPresent(
-                serverFiltList -> {
-                    //Server Logic
-                    NetworkHooks.openScreen(
-                            context.getSender(),
-                            new SimpleMenuProvider(
-                                    (containerId, playerInventory, player) -> new FiltMenu(containerId, playerInventory, serverFiltList),
-                                    Component.translatable("filtpick_screen_name")
-                            )
-                    );
-                }));
+
         context.setPacketHandled(true);
     }
 }
