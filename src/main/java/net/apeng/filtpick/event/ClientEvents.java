@@ -48,7 +48,6 @@ public class ClientEvents {
         @SubscribeEvent
         public static void addEntryButton(ScreenEvent.Init.Post event) {
             if (event.getScreen() instanceof InventoryScreen screen) {
-                Minecraft.getInstance().player.sendSystemMessage(Component.literal("Opened inventory screen"));
                 entryButton = new ImageButton(screen.getGuiLeft() + 104 + 22, screen.height / 2 - 22, 20, 18, 0, 0, 19, FiltScreen.FILTPICK_ENTRY_BUTTON_LOCATION, (button) -> {
                     NetWorkHandler.sendToServer(new OpenFiltScreenC2SPacket());
                 });

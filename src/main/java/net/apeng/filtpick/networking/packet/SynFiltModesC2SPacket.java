@@ -26,7 +26,6 @@ public class SynFiltModesC2SPacket extends SynFiltListAbstractPacket {
             context.getSender().getCapability(FiltListProvider.FILT_LIST).ifPresent(serverFiltList -> {
                 //Server Logic
                 serverFiltList.copyModesFrom(this.getFiltList());
-                context.getSender().sendSystemMessage(Component.literal("Syn filtlist C2S completed"));
             });
         });
         context.setPacketHandled(true);

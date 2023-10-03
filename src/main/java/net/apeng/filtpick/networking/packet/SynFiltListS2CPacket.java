@@ -33,7 +33,6 @@ public class SynFiltListS2CPacket extends SynFiltListAbstractPacket {
     public void handlePacket(FiltList serverFiltList, Supplier<NetworkEvent.Context> supplier) {
         // Do stuff
         FiltPick.CLIENT_FILT_LIST.copyFrom(serverFiltList);
-        Minecraft.getInstance().player.sendSystemMessage(Component.literal("Syn filtlist S2C completed"));
     }
 }
 
