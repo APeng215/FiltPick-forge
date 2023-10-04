@@ -11,8 +11,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
-import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.data.event.GatherDataEvent;
@@ -21,7 +21,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
-
+@OnlyIn(Dist.CLIENT)
 public class ClientEvents {
     public static ImageButton entryButton;
 
@@ -31,18 +31,6 @@ public class ClientEvents {
         @SubscribeEvent
         // Event is on the Forge event bus only on the physical client
         public static void onKeyPressed(TickEvent.ClientTickEvent event) {
-            if (event.phase == TickEvent.Phase.END) { // Only call code once as the tick event is called twice every tick
-                while (KeyBinding.OPEN_FILTLIST_MAP.consumeClick()) {
-                    // Execute logic to perform on click here
-                    NetWorkHandler.sendToServer(new OpenFiltScreenC2SPacket());
-                }
-                while (KeyBinding.SET_ITEM_MAP.consumeClick()) {
-                    // Execute logic to perform on click here
-                    FiltPick.CLIENT_FILT_LIST.setStackInSlot(0, Minecraft.getInstance().player.getMainHandItem());
-                    NetWorkHandler.sendToServer(new SynFiltModesC2SPacket(FiltPick.CLIENT_FILT_LIST));
-                }
-
-            }
         }
 
         @SubscribeEvent
@@ -67,17 +55,6 @@ public class ClientEvents {
 
     @Mod.EventBusSubscriber(modid = FiltPick.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class ClientModEvents {
-        @SubscribeEvent
-        public static void onKeyRegister(RegisterKeyMappingsEvent event) {
-            event.register(KeyBinding.SET_ITEM_MAP);
-            event.register(KeyBinding.OPEN_FILTLIST_MAP);
-        }
-
-
-        @SubscribeEvent
-        public static void gatherData(GatherDataEvent event) {
-
-        }
 
         @SubscribeEvent
         public static void registerScreens(FMLClientSetupEvent event) {

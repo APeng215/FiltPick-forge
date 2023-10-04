@@ -3,7 +3,6 @@ package net.apeng.filtpick.networking.packet;
 import net.apeng.filtpick.capability.FiltList;
 import net.apeng.filtpick.capability.FiltListProvider;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;

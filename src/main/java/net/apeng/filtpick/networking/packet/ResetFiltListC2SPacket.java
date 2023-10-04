@@ -1,13 +1,9 @@
 package net.apeng.filtpick.networking.packet;
 
 import net.apeng.filtpick.capability.FiltListProvider;
-import net.apeng.filtpick.gui.FiltMenu;
 import net.apeng.filtpick.networking.NetWorkHandler;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.SimpleMenuProvider;
 import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.NetworkHooks;
 
 import java.util.function.Supplier;
 
