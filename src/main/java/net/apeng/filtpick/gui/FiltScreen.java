@@ -9,12 +9,17 @@ import net.apeng.filtpick.networking.packet.SynFiltModesC2SPacket;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.StateSwitchingButton;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.CreativeModeTab;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class FiltScreen extends AbstractContainerScreen<FiltMenu> {
     public static final ResourceLocation BACKGROUND_LOCATION = new ResourceLocation("textures/gui/container/shulker_box.png");
@@ -58,14 +63,14 @@ public class FiltScreen extends AbstractContainerScreen<FiltMenu> {
                     NetWorkHandler.sendToServer(new ResetFiltListC2SPacket());
                     filtModeButton.setStateTriggered(false);
                     destructionModeButton.setStateTriggered(false);
-                    filtModeButton.setTooltip(filtModeButton.isStateTriggered() ?
-                            Tooltip.create(Component.translatable("whitelist_mode").append("\n").withStyle(ChatFormatting.DARK_GREEN).append(Component.translatable("whitelist_mode_explanation").withStyle(ChatFormatting.DARK_GRAY))) :
-                            Tooltip.create(Component.translatable("blacklist_mode").append("\n").withStyle(ChatFormatting.DARK_RED).append(Component.translatable("blacklist_mode_explanation").withStyle(ChatFormatting.DARK_GRAY)))
-                    );
-                    destructionModeButton.setTooltip(destructionModeButton.isStateTriggered() ?
-                            Tooltip.create(Component.translatable("destruction_mode_on").append("\n").withStyle(ChatFormatting.DARK_RED).append(Component.translatable("destruction_mode_on_explanation").withStyle(ChatFormatting.DARK_GRAY))) :
-                            Tooltip.create(Component.translatable("destruction_mode_off").withStyle(ChatFormatting.DARK_GRAY))
-                    );
+//                    filtModeButton.setTooltip(filtModeButton.isStateTriggered() ?
+//                            Tooltip.create(Component.translatable("whitelist_mode").append("\n").withStyle(ChatFormatting.DARK_GREEN).append(Component.translatable("whitelist_mode_explanation").withStyle(ChatFormatting.DARK_GRAY))) :
+//                            Tooltip.create(Component.translatable("blacklist_mode").append("\n").withStyle(ChatFormatting.DARK_RED).append(Component.translatable("blacklist_mode_explanation").withStyle(ChatFormatting.DARK_GRAY)))
+//                    );
+//                    destructionModeButton.setTooltip(destructionModeButton.isStateTriggered() ?
+//                            Tooltip.create(Component.translatable("destruction_mode_on").append("\n").withStyle(ChatFormatting.DARK_RED).append(Component.translatable("destruction_mode_on_explanation").withStyle(ChatFormatting.DARK_GRAY))) :
+//                            Tooltip.create(Component.translatable("destruction_mode_off").withStyle(ChatFormatting.DARK_GRAY))
+//                    );
                 }
         );
         this.addRenderableWidget(resetButton);
@@ -74,14 +79,14 @@ public class FiltScreen extends AbstractContainerScreen<FiltMenu> {
     private void updateButtonsStates() {
         filtModeButton.setStateTriggered(FiltPick.CLIENT_FILT_LIST.isWhitelistModeOn());
         destructionModeButton.setStateTriggered(FiltPick.CLIENT_FILT_LIST.isDestructionModeOn());
-        filtModeButton.setTooltip(filtModeButton.isStateTriggered() ?
-                Tooltip.create(Component.translatable("whitelist_mode").append("\n").withStyle(ChatFormatting.DARK_GREEN).append(Component.translatable("whitelist_mode_explanation").withStyle(ChatFormatting.DARK_GRAY))) :
-                Tooltip.create(Component.translatable("blacklist_mode").append("\n").withStyle(ChatFormatting.DARK_RED).append(Component.translatable("blacklist_mode_explanation").withStyle(ChatFormatting.DARK_GRAY)))
-        );
-        destructionModeButton.setTooltip(destructionModeButton.isStateTriggered() ?
-                Tooltip.create(Component.translatable("destruction_mode_on").append("\n").withStyle(ChatFormatting.DARK_RED).append(Component.translatable("destruction_mode_on_explanation").withStyle(ChatFormatting.DARK_GRAY))) :
-                Tooltip.create(Component.translatable("destruction_mode_off").withStyle(ChatFormatting.DARK_GRAY))
-        );
+//        filtModeButton.setTooltip(filtModeButton.isStateTriggered() ?
+//                Tooltip.create(Component.translatable("whitelist_mode").append("\n").withStyle(ChatFormatting.DARK_GREEN).append(Component.translatable("whitelist_mode_explanation").withStyle(ChatFormatting.DARK_GRAY))) :
+//                Tooltip.create(Component.translatable("blacklist_mode").append("\n").withStyle(ChatFormatting.DARK_RED).append(Component.translatable("blacklist_mode_explanation").withStyle(ChatFormatting.DARK_GRAY)))
+//        );
+//        destructionModeButton.setTooltip(destructionModeButton.isStateTriggered() ?
+//                Tooltip.create(Component.translatable("destruction_mode_on").append("\n").withStyle(ChatFormatting.DARK_RED).append(Component.translatable("destruction_mode_on_explanation").withStyle(ChatFormatting.DARK_GRAY))) :
+//                Tooltip.create(Component.translatable("destruction_mode_off").withStyle(ChatFormatting.DARK_GRAY))
+//        );
     }
 
     private void initReturnButton() {
@@ -132,6 +137,13 @@ public class FiltScreen extends AbstractContainerScreen<FiltMenu> {
         this.renderBackground(pose);
         super.render(pose, mouseX, mouseY, partialTick);
 
+        if (this.filtModeButton.isHoveredOrFocused()) {
+            this.renderComponentTooltip(pose, getFiltModeButtonTooltip(), mouseX, mouseY);
+        }
+        if (this.destructionModeButton.isHoveredOrFocused()) {
+            this.renderComponentTooltip(pose, getDestructionModeButtonTooltip(), mouseX, mouseY);
+        }
+
         /*
          * This method is added by the container screen to render
          * a tooltip for whatever slot is hovered over.
@@ -139,6 +151,19 @@ public class FiltScreen extends AbstractContainerScreen<FiltMenu> {
         this.renderTooltip(pose, mouseX, mouseY);
     }
 
+    private List<Component> getFiltModeButtonTooltip() {
+        return this.filtModeButton.isStateTriggered() ?
+                new ArrayList<Component>(Arrays.asList(Component.translatable("whitelist_mode").withStyle(ChatFormatting.DARK_GREEN), Component.translatable("whitelist_mode_explanation").withStyle(ChatFormatting.DARK_GRAY))) :
+                new ArrayList<Component>(Arrays.asList(Component.translatable("blacklist_mode").withStyle(ChatFormatting.DARK_RED), Component.translatable("blacklist_mode_explanation").withStyle(ChatFormatting.DARK_GRAY)));
+    }
+
+
+
+    private List<Component> getDestructionModeButtonTooltip() {
+        return this.destructionModeButton.isStateTriggered() ?
+                new ArrayList<Component>(Arrays.asList(Component.translatable("destruction_mode_on").withStyle(ChatFormatting.DARK_RED), Component.translatable("destruction_mode_on_explanation").withStyle(ChatFormatting.DARK_GRAY))) :
+                new ArrayList<Component>(Arrays.asList(Component.translatable("destruction_mode_off").withStyle(ChatFormatting.DARK_GRAY)));
+    }
     @Override
     protected void renderBg(PoseStack pose, float p_97788_, int p_97789_, int p_97790_) {
         /*
@@ -172,4 +197,5 @@ public class FiltScreen extends AbstractContainerScreen<FiltMenu> {
         }
         return super.mouseClicked(p_97748_, p_97749_, p_97750_);
     }
+
 }
