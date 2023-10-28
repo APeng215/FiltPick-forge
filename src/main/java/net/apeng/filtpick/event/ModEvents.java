@@ -12,6 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -28,25 +29,24 @@ public class ModEvents {
         player.getCapability(FiltListProvider.FILT_LIST).ifPresent(filtList -> {
             boolean matched = hasMatchedItem(pickedItem, filtList);
 
-            //If is black-list mode
+
+            // If is black-list mode
             if (!filtList.isWhitelistModeOn()) {
-                event.setCanceled(false);
                 if (matched) {
+                    event.setCanceled(true);
                     //If the destruction-mode is on
                     if (filtList.isDestructionModeOn()) itemEntity.discard();
-                    event.setCanceled(true);
                 }
-
-
             }
-            //If is white-list mode
+
+
+            // If is white-list mode
             else {
-                event.setCanceled(true);
-                if (matched) event.setCanceled(false);
-                else if (filtList.isDestructionModeOn()) itemEntity.discard();
-
+                if (!matched) {
+                    event.setCanceled(true);
+                    if (filtList.isDestructionModeOn()) itemEntity.discard();
+                }
             }
-
         });
     }
 
@@ -70,14 +70,13 @@ public class ModEvents {
 
 
     private static boolean hasMatchedItem(Item pickedItem, FiltList filtList) {
-        boolean matched = false;
         //Check if there is matched item in the list
         for (int i = 0; i < filtList.getSlots(); i++) {
             ItemStack itemStack = filtList.getStackInSlot(i);
             if (itemStack.getItem().equals(pickedItem)) {
-                matched = true;
+                return true;
             }
         }
-        return matched;
+        return false;
     }
 }
