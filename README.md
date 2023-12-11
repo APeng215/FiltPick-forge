@@ -2,6 +2,10 @@
 
 # FiltPick
 
+[![CurseForge site](http://cf.way2muchnoise.eu/full_filtpick_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/filtpick)
+[![Dynamic JSON Badge](https://img.shields.io/badge/dynamic/json?url=https://api.modrinth.com/v2/project/filtpick&query=$.downloads&suffix=%20downloads&logo=Modrinth&label)](https://modrinth.com/mod/filtpick)
+
+
 This is a forge minecraft mod which enables you to 
 pick up items selectively. It's a lightweight mod and has a easy-to-use gui.
 
@@ -27,8 +31,9 @@ pick up items selectively. It's a lightweight mod and has a easy-to-use gui.
 
 ## Contact me 
 
-CurseForge: https://www.curseforge.com/minecraft/mc-mods/filtpick  
-GitHub: https://github.com/APeng215/FiltPick  
-MCMOD: https://www.mcmod.cn/class/8081.html  
-bilibili: https://space.bilibili.com/3355720
+- CurseForge: https://www.curseforge.com/minecraft/mc-mods/filtpick  
+- Modrinth: https://modrinth.com/mod/filtpick
+- GitHub: https://github.com/APeng215/FiltPick  
+- MCMOD: https://www.mcmod.cn/class/8081.html  
+- bilibili: https://space.bilibili.com/3355720
 
