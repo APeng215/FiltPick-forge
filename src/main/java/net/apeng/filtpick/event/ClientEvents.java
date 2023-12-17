@@ -30,22 +30,35 @@ public class ClientEvents {
         }
 
         @SubscribeEvent
-        public static void addEntryButton(ScreenEvent.Init.Post event) {
+        public static void initAndAddEntryButton(ScreenEvent.Init.Post event) {
             if (event.getScreen() instanceof InventoryScreen screen) {
-                entryButton = new ImageButton(screen.getGuiLeft() + 104 + 22, screen.height / 2 - 22, 20, 18, 0, 0, 19, FiltScreen.FILTPICK_ENTRY_BUTTON_LOCATION, (button) -> {
-                    NetWorkHandler.sendToServer(new OpenFiltScreenC2SPacket());
-                });
-                event.addListener(entryButton);
-
+                initEntryButton(screen);
+                addEntryButton(event);
             }
         }
 
         @SubscribeEvent
-        public static void modifyRecipeButtonListener(ScreenEvent.MouseButtonPressed.Post event) {
+        public static void entryButtonPositionAdapter(ScreenEvent.MouseButtonPressed.Post event) {
             if (event.getScreen() instanceof InventoryScreen screen) {
-                entryButton.setPosition(screen.getGuiLeft() + 104 + 22, screen.height / 2 - 22);
+                adaptEntryButtonPosition(screen);
             }
         }
+
+        private static void adaptEntryButtonPosition(InventoryScreen screen) {
+            entryButton.setPosition(screen.getGuiLeft() + 104 + 22, screen.height / 2 - 22);
+        }
+
+        private static void addEntryButton(ScreenEvent.Init.Post event) {
+            event.addListener(entryButton);
+        }
+
+        private static void initEntryButton(InventoryScreen screen) {
+            entryButton = new ImageButton(screen.getGuiLeft() + 104 + 22, screen.height / 2 - 22, 20, 18, 0, 0, 19, FiltScreen.FILTPICK_ENTRY_BUTTON_LOCATION, (button) -> {
+                NetWorkHandler.sendToServer(new OpenFiltScreenC2SPacket());
+            });
+        }
+
+
     }
 
 
@@ -53,10 +66,8 @@ public class ClientEvents {
     public static class ClientModEvents {
 
         @SubscribeEvent
-        public static void registerScreens(FMLClientSetupEvent event) {
-            event.enqueueWork(
-                    () -> MenuScreens.register(FiltMenu.MENU_TYPE.get(), FiltScreen::new)
-            );
+        public static void registerMenuScreen(FMLClientSetupEvent event) {
+            event.enqueueWork(() -> MenuScreens.register(FiltMenu.MENU_TYPE.get(), FiltScreen::new));
         }
     }
 

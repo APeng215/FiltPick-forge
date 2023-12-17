@@ -25,31 +25,11 @@ public class ModEvents {
         Item pickedItem = itemEntity.getItem().getItem();
         Player player = event.getEntity();
 
-
         player.getCapability(FiltListProvider.FILT_LIST).ifPresent(filtList -> {
-            boolean matched = hasMatchedItem(pickedItem, filtList);
-
-
-            // If is black-list mode
-            if (!filtList.isWhitelistModeOn()) {
-                if (matched) {
-                    event.setCanceled(true);
-                    //If the destruction-mode is on
-                    if (filtList.isDestructionModeOn()) itemEntity.discard();
-                }
-            }
-
-
-            // If is white-list mode
-            else {
-                if (!matched) {
-                    event.setCanceled(true);
-                    if (filtList.isDestructionModeOn()) itemEntity.discard();
-                }
-            }
+            applyFiltPick(event, event.getItem(), filtList, hasMatchedItem(pickedItem, filtList));
         });
-    }
 
+    }
 
     @SubscribeEvent
     public static void attachCapability2Player(AttachCapabilitiesEvent<Entity> event) {
@@ -66,6 +46,48 @@ public class ModEvents {
         oldPlayer.reviveCaps();
         oldPlayer.getCapability(FiltListProvider.FILT_LIST).ifPresent(oldList -> event.getEntity().getCapability(FiltListProvider.FILT_LIST).ifPresent(newList -> newList.copyFrom(oldList)));
         oldPlayer.invalidateCaps();
+    }
+
+    private static void applyFiltPick(EntityItemPickupEvent event, ItemEntity itemEntity, FiltList filtList, boolean matched) {
+        if (isBlackListMode(filtList)) {
+            applyBlackListMode(event, itemEntity, filtList, matched);
+        } else {
+            applyWhiteListMode(event, itemEntity, filtList, matched);
+        }
+    }
+
+    private static void applyWhiteListMode(EntityItemPickupEvent event, ItemEntity itemEntity, FiltList filtList, boolean matched) {
+        if (!matched) {
+            dontPick(event);
+            if (isDestructionMode(filtList)) {
+                discardItem(itemEntity);
+            }
+        }
+    }
+
+    private static void applyBlackListMode(EntityItemPickupEvent event, ItemEntity itemEntity, FiltList filtList, boolean matched) {
+        if (matched) {
+            dontPick(event);
+            if (isDestructionMode(filtList)) {
+                discardItem(itemEntity);
+            }
+        }
+    }
+
+    private static void discardItem(ItemEntity itemEntity) {
+        itemEntity.discard();
+    }
+
+    private static boolean isDestructionMode(FiltList filtList) {
+        return filtList.isDestructionModeOn();
+    }
+
+    private static void dontPick(EntityItemPickupEvent event) {
+        event.setCanceled(true);
+    }
+
+    private static boolean isBlackListMode(FiltList filtList) {
+        return !filtList.isWhitelistModeOn();
     }
 
     private static boolean hasMatchedItem(Item pickedItem, FiltList filtList) {
