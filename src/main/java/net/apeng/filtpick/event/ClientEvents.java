@@ -5,17 +5,12 @@ import net.apeng.filtpick.gui.FiltMenu;
 import net.apeng.filtpick.gui.FiltScreen;
 import net.apeng.filtpick.networking.NetWorkHandler;
 import net.apeng.filtpick.networking.packet.OpenFiltScreenC2SPacket;
-import net.apeng.filtpick.networking.packet.SynFiltModesC2SPacket;
-import net.apeng.filtpick.util.KeyBinding;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.ScreenEvent;
-import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -23,6 +18,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 @OnlyIn(Dist.CLIENT)
 public class ClientEvents {
+
     public static ImageButton entryButton;
 
     @Mod.EventBusSubscriber(modid = FiltPick.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -63,4 +59,5 @@ public class ClientEvents {
             );
         }
     }
+
 }

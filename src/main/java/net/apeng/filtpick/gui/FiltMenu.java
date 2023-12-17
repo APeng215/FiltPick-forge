@@ -54,11 +54,11 @@ public class FiltMenu extends AbstractContainerMenu {
         }
 
 
-    }    public static final RegistryObject<MenuType<FiltMenu>> MENU_TYPE = REGISTER.register("filt_screen", () -> IForgeMenuType.create(FiltMenu::new));
+    }
 
     protected boolean allowRepeats() {
         return false;
-    }
+    }    public static final RegistryObject<MenuType<FiltMenu>> MENU_TYPE = REGISTER.register("filt_screen", () -> IForgeMenuType.create(FiltMenu::new));
 
     @Override
     public boolean canTakeItemForPickAll(ItemStack stack, Slot slotIn) {

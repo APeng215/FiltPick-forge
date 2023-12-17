@@ -20,6 +20,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class FiltScreen extends AbstractContainerScreen<FiltMenu> {
+
     public static final ResourceLocation BACKGROUND_LOCATION = new ResourceLocation("textures/gui/container/shulker_box.png");
     public static final ResourceLocation FILT_MOD_BUTTON_TEXTURE_LOCATION = new ResourceLocation(FiltPick.MOD_ID, "textures/guis/filtpick_mode_button.png");
     public static final ResourceLocation DESTRUCTION_MOD_BUTTON_TEXTURE_LOCATION = new ResourceLocation(FiltPick.MOD_ID, "textures/guis/filtpick_destruction_on_button.png");
@@ -32,7 +33,6 @@ public class FiltScreen extends AbstractContainerScreen<FiltMenu> {
 
     public FiltScreen(FiltMenu menu, Inventory playerInventory, Component title) {
         super(menu, playerInventory, title);
-
         this.titleLabelX = 72;
         this.inventoryLabelX = 10;
     }
@@ -151,8 +151,6 @@ public class FiltScreen extends AbstractContainerScreen<FiltMenu> {
         // Add widgets and precomputed values
         this.addRenderableWidget(filtModeButton);
     }
-
-
 
 
     @Override

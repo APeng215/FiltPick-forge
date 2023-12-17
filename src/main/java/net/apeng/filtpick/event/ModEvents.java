@@ -12,12 +12,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = FiltPick.MOD_ID)
 public class ModEvents {
+
     @SubscribeEvent
     public static void itemsFilt(EntityItemPickupEvent event) {
 
@@ -67,7 +67,6 @@ public class ModEvents {
         oldPlayer.getCapability(FiltListProvider.FILT_LIST).ifPresent(oldList -> event.getEntity().getCapability(FiltListProvider.FILT_LIST).ifPresent(newList -> newList.copyFrom(oldList)));
         oldPlayer.invalidateCaps();
     }
-
 
     private static boolean hasMatchedItem(Item pickedItem, FiltList filtList) {
         //Check if there is matched item in the list

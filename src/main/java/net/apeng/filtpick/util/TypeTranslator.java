@@ -3,6 +3,7 @@ package net.apeng.filtpick.util;
 import com.electronwill.nightconfig.core.conversion.InvalidValueException;
 
 public class TypeTranslator {
+
     public static boolean intToBool(int i) {
         switch (i) {
             case 0 -> {

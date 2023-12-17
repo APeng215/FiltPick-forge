@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class FiltListProvider implements ICapabilitySerializable<CompoundTag> {
+
     public static final Capability<FiltList> FILT_LIST = CapabilityManager.get(new CapabilityToken<>() {
     });
     private FiltList filtList = null;

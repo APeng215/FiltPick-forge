@@ -14,10 +14,10 @@ import org.slf4j.Logger;
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(FiltPick.MOD_ID)
 public class FiltPick {
+
     public static final String MOD_ID = "filtpick";
     public static final FiltList CLIENT_FILT_LIST = new FiltList(27);
     public static final Logger LOGGER = LogUtils.getLogger();
-
 
     public FiltPick() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -34,4 +34,5 @@ public class FiltPick {
     private void commonSetup(final FMLCommonSetupEvent event) {
         NetWorkHandler.register();
     }
+
 }

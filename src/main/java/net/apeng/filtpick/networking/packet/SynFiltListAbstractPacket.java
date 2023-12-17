@@ -7,6 +7,7 @@ import net.minecraftforge.network.NetworkEvent;
 import java.util.function.Supplier;
 
 public abstract class SynFiltListAbstractPacket {
+
     private final FiltList filtList = new FiltList(27);
 
     public SynFiltListAbstractPacket(FiltList filtList) {

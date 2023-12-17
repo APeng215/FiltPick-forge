@@ -16,7 +16,6 @@ public class FiltList extends ItemStackHandler {
         super(size);
     }
 
-
     public boolean isWhitelistModeOn() {
         return whitelistModeOn;
     }
@@ -61,7 +60,6 @@ public class FiltList extends ItemStackHandler {
         this.whitelistModeOn = source.whitelistModeOn;
         this.destructionModeOn = source.destructionModeOn;
     }
-
 
     @Override
     public CompoundTag serializeNBT() {

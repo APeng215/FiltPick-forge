@@ -9,7 +9,6 @@ import java.util.function.Supplier;
 
 public class SynFiltModesC2SPacket extends SynFiltListAbstractPacket {
 
-
     public SynFiltModesC2SPacket(FiltList filtList) {
         super(filtList);
     }
@@ -17,7 +16,6 @@ public class SynFiltModesC2SPacket extends SynFiltListAbstractPacket {
     public SynFiltModesC2SPacket(FriendlyByteBuf buf) {
         super(buf);
     }
-
 
     public void handler(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
