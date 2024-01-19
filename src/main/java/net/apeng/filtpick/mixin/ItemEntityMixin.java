@@ -24,9 +24,9 @@ import java.util.Collections;
 
 
 @Mixin(ItemEntity.class)
-public abstract class FiltableItemEntity extends Entity {
+public abstract class ItemEntityMixin extends Entity {
 
-    public FiltableItemEntity(EntityType<?> type, Level world) {
+    public ItemEntityMixin(EntityType<?> type, Level world) {
         super(type, world);
     }
 

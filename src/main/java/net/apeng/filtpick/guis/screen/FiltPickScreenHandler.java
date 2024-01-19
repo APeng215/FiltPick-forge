@@ -150,7 +150,7 @@ public class FiltPickScreenHandler extends AbstractContainerMenu {
     private void onFiltSlotClicked(int slotIndex, ClickType actionType) {
         int filtSlotIndex = slotIndex - 36;
         switch (actionType) {
-            case THROW -> setFiltStackEmpty(filtSlotIndex);
+            case THROW, QUICK_MOVE -> setFiltStackEmpty(filtSlotIndex);
             case PICKUP, QUICK_CRAFT -> setFiltStackCursorItem(filtSlotIndex);
         }
         markSlotDirty(slotIndex);

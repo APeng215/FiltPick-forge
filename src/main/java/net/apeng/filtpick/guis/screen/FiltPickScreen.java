@@ -2,7 +2,7 @@ package net.apeng.filtpick.guis.screen;
 
 
 import net.apeng.filtpick.FiltPick;
-import net.apeng.filtpick.guis.widget.LegacyTexturedButtonWidget;
+import net.apeng.filtpick.guis.util.LegacyTexturedButtonWidget;
 import net.apeng.filtpick.util.IntBoolConvertor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;

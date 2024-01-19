@@ -1,7 +1,7 @@
 package net.apeng.filtpick.mixin;
 
 import net.apeng.filtpick.FiltPick;
-import net.apeng.filtpick.guis.widget.LegacyTexturedButtonWidget;
+import net.apeng.filtpick.guis.util.LegacyTexturedButtonWidget;
 import net.apeng.filtpick.network.NetworkHandler;
 import net.apeng.filtpick.network.OpenFiltPickScreenC2SPacket;
 import net.minecraft.ChatFormatting;
