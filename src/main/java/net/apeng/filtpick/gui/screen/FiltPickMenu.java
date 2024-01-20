@@ -1,4 +1,4 @@
-package net.apeng.filtpick.guis.screen;
+package net.apeng.filtpick.gui.screen;
 
 import net.apeng.filtpick.FiltPick;
 import net.apeng.filtpick.mixinduck.FiltListContainer;
@@ -15,21 +15,21 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.NotNull;
 
-public class FiltPickScreenHandler extends AbstractContainerMenu {
+public class FiltPickMenu extends AbstractContainerMenu {
 
     public static final DeferredRegister<MenuType<?>> REGISTER = DeferredRegister.create(ForgeRegistries.MENU_TYPES, FiltPick.ID);
-    public static final RegistryObject<MenuType<FiltPickScreenHandler>> TYPE = REGISTER.register("filt_menu", () -> new MenuType(FiltPickScreenHandler::new, FeatureFlags.DEFAULT_FLAGS));
+    public static final RegistryObject<MenuType<FiltPickMenu>> TYPE = REGISTER.register("filt_menu", () -> new MenuType(FiltPickMenu::new, FeatureFlags.DEFAULT_FLAGS));
     private final ContainerData propertyDelegate;
     private final Inventory playerInventory;
     private final Container filtList;
 
     // For client side
-    public FiltPickScreenHandler(int syncId, Inventory playerInventory) {
+    public FiltPickMenu(int syncId, Inventory playerInventory) {
         this(syncId, playerInventory, new SimpleContainer(27), new SimpleContainerData(2));
     }
 
     // For server side        
-    public FiltPickScreenHandler(int syncId, Inventory playerInventory, Container filtList, ContainerData propertyDelegate) {
+    public FiltPickMenu(int syncId, Inventory playerInventory, Container filtList, ContainerData propertyDelegate) {
         super(TYPE.get(), syncId);
         this.propertyDelegate = propertyDelegate;
         this.playerInventory = playerInventory;

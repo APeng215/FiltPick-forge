@@ -1,7 +1,7 @@
-package net.apeng.filtpick.util;
+package net.apeng.filtpick.property;
 
 
-import net.apeng.filtpick.guis.screen.FiltPickScreen;
+import net.apeng.filtpick.gui.screen.FiltPickScreen;
 import net.minecraft.world.inventory.ContainerData;
 
 public class FiltListPropertyDelegate implements ContainerData {

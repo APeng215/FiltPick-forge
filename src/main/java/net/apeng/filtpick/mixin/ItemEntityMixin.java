@@ -1,7 +1,7 @@
 package net.apeng.filtpick.mixin;
 
 
-import net.apeng.filtpick.guis.screen.FiltPickScreen;
+import net.apeng.filtpick.gui.screen.FiltPickScreen;
 import net.apeng.filtpick.mixinduck.FiltListContainer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;

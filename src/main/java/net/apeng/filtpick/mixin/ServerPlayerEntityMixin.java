@@ -2,10 +2,10 @@ package net.apeng.filtpick.mixin;
 
 
 import com.mojang.authlib.GameProfile;
-import net.apeng.filtpick.guis.screen.FiltPickScreen;
+import net.apeng.filtpick.gui.screen.FiltPickScreen;
 import net.apeng.filtpick.mixinduck.FiltListContainer;
-import net.apeng.filtpick.util.ExtendedMenuProvider;
-import net.apeng.filtpick.util.FiltListPropertyDelegate;
+import net.apeng.filtpick.gui.util.ExtendedMenuProvider;
+import net.apeng.filtpick.property.FiltListPropertyDelegate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;

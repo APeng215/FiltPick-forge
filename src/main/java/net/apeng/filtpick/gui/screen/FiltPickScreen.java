@@ -1,8 +1,8 @@
-package net.apeng.filtpick.guis.screen;
+package net.apeng.filtpick.gui.screen;
 
 
 import net.apeng.filtpick.FiltPick;
-import net.apeng.filtpick.guis.util.LegacyTexturedButtonWidget;
+import net.apeng.filtpick.gui.util.LegacyTexturedButtonWidget;
 import net.apeng.filtpick.util.IntBoolConvertor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
@@ -24,7 +24,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ContainerData;
 
-public class FiltPickScreen extends AbstractContainerScreen<FiltPickScreenHandler> {
+public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
 
     public static final int WHITELIST_MODE_BUTTON_ID = 0;
     public static final int DESTRUCTION_MODE_BUTTON_ID = 1;
@@ -39,7 +39,7 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickScreenHandle
     private FPToggleButton filtModeButton, destructionButton;
     private LegacyTexturedButtonWidget clearButton, returnButton;
 
-    public FiltPickScreen(FiltPickScreenHandler handler, Inventory inventory, Component title) {
+    public FiltPickScreen(FiltPickMenu handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
     }
 

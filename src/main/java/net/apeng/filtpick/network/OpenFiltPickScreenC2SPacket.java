@@ -1,8 +1,8 @@
 package net.apeng.filtpick.network;
 
-import net.apeng.filtpick.guis.screen.FiltPickScreenHandler;
+import net.apeng.filtpick.gui.screen.FiltPickMenu;
 import net.apeng.filtpick.mixinduck.FiltListContainer;
-import net.apeng.filtpick.util.ExtendedMenuProvider;
+import net.apeng.filtpick.gui.util.ExtendedMenuProvider;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -30,7 +30,7 @@ public class OpenFiltPickScreenC2SPacket {
 
             @Override
             public AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer) {
-                return new FiltPickScreenHandler(pContainerId, pPlayerInventory, ((FiltListContainer)pPlayer).getFiltList(), ((FiltListContainer)pPlayer).getFiltListPropertyDelegate());
+                return new FiltPickMenu(pContainerId, pPlayerInventory, ((FiltListContainer)pPlayer).getFiltList(), ((FiltListContainer)pPlayer).getFiltListPropertyDelegate());
             }
 
         });

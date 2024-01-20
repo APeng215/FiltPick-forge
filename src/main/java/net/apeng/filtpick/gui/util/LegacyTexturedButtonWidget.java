@@ -1,4 +1,4 @@
-package net.apeng.filtpick.guis.util;
+package net.apeng.filtpick.gui.util;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
