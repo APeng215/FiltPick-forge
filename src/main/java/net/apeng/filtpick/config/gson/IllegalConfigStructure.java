@@ -1,9 +1,11 @@
 package net.apeng.filtpick.config.gson;
 
+import java.io.IOException;
+
 /**
  * An exception indicates that the config file content is illegal
  */
-public class IllegalConfigStructure extends RuntimeException {
+public class IllegalConfigStructure extends IOException {
 
     /**
      * Constructs a new runtime exception with {@code null} as its

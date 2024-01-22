@@ -29,14 +29,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(InventoryScreen.class)
 public abstract class InventoryScreenMixin extends EffectRenderingInventoryScreen<InventoryMenu> implements RecipeUpdateListener {
 
-    @Shadow
-    private @Final RecipeBookComponent recipeBookComponent;
-    @Unique
-    private static final ResourceLocation FILTPICK_ENTRY_TEXTURE = ResourceLocation.tryBuild(FiltPick.ID, "gui/entry_button.png");
-    @Unique
-    private ImageButton recipeBookButton;
-    @Unique
-    private ImageButton filtPickEntryButton;
+    @Shadow private @Final RecipeBookComponent recipeBookComponent;
+
+    @Unique private static final ResourceLocation FILTPICK_ENTRY_TEXTURE = ResourceLocation.tryBuild(FiltPick.ID, "gui/entry_button.png");
+    @Unique private ImageButton recipeBookButton;
+    @Unique private ImageButton filtPickEntryButton;
+    @Unique private static int filtPickEntryButtonPosX;
+    @Unique private static int filtPickEntryButtonPosY;
+    @Unique private static int recipeButtonPosX;
+    @Unique private static int recipeButtonPosY;
 
     public InventoryScreenMixin(InventoryMenu screenHandler, Inventory playerInventory, Component text) {
         super(screenHandler, playerInventory, text);
@@ -67,29 +68,40 @@ public abstract class InventoryScreenMixin extends EffectRenderingInventoryScree
 
     @Unique
     private void initRecipeBookButton() {
-        recipeBookButton = new ImageButton(this.leftPos + 104, this.height / 2 - 22, 20, 18, RecipeBookComponent.RECIPE_BUTTON_SPRITES, button -> {
+        calculateRecipeButtonPos();
+        recipeBookButton = new ImageButton(recipeButtonPosX, recipeButtonPosY, 20, 18, RecipeBookComponent.RECIPE_BUTTON_SPRITES, button -> {
             recipeBookComponent.toggleVisibility();
             this.leftPos = recipeBookComponent.updateScreenPosition(this.width, this.imageWidth);
-            button.setPosition(this.leftPos + 104, this.height / 2 - 22);
-            recipeBookButton.setPosition(this.leftPos + 104 , this.height / 2 - 22);
-            filtPickEntryButton.setPosition(getFiltPickEntryButtonPosX(), getFiltPickEntryButtonPosY());
+            calculateRecipeButtonPos();
+            recipeBookButton.setPosition(recipeButtonPosX, recipeButtonPosY);
+            calculateEntryButtonPos();
+            filtPickEntryButton.setPosition(filtPickEntryButtonPosX, filtPickEntryButtonPosY);
         });
     }
 
     @Unique
     private void initFiltPickEntryButton() {
-        filtPickEntryButton = new LegacyTexturedButtonWidget(getFiltPickEntryButtonPosX(), getFiltPickEntryButtonPosY(), 20, 18, 0, 0, 19, FILTPICK_ENTRY_TEXTURE, button -> NetworkHandler.send2Server(new OpenFiltPickScreenC2SPacket()));
+        calculateEntryButtonPos();
+        filtPickEntryButton = new LegacyTexturedButtonWidget(filtPickEntryButtonPosX, filtPickEntryButtonPosY, 20, 18, 0, 0, 19, FILTPICK_ENTRY_TEXTURE, button -> NetworkHandler.send2Server(new OpenFiltPickScreenC2SPacket()));
         setTooltip2EntryButton();
     }
 
+    /**
+     * Should be invoked every time before the positions are accessed.
+     */
     @Unique
-    private int getFiltPickEntryButtonPosX() {
-        return this.leftPos + 104 + 23 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.ENTRY_BUTTON).xOffset();
+    private void calculateEntryButtonPos() {
+        filtPickEntryButtonPosX = this.leftPos + 104 + 23 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.ENTRY_BUTTON).xOffset();
+        filtPickEntryButtonPosY = this.height / 2 - 22 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.ENTRY_BUTTON).yOffset();
     }
 
+    /**
+     * Should be invoked every time before the positions are accessed.
+     */
     @Unique
-    private int getFiltPickEntryButtonPosY() {
-        return this.height / 2 - 22 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.ENTRY_BUTTON).yOffset();
+    private void calculateRecipeButtonPos() {
+        recipeButtonPosX = this.leftPos + 104 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.RECIPE_BUTTON).xOffset();
+        recipeButtonPosY = this.height / 2 - 22 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.RECIPE_BUTTON).yOffset();
     }
 
     @Unique

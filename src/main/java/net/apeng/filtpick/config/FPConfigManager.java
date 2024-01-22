@@ -5,6 +5,7 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import net.apeng.filtpick.config.gson.Adaptable;
 import net.apeng.filtpick.config.gson.IllegalConfigStructure;
+import net.apeng.filtpick.config.util.WidgetPosOffset;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.io.IOException;
@@ -13,8 +14,8 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Singleton
@@ -79,11 +80,11 @@ public final class FPConfigManager {
         } catch (JsonSyntaxException e) {
             logger.error(e);
             logger.error("The json syntax for file 'filtpick.json' is illegal.");
-            logger.info("Trying to recreate a default 'filtpick.json'...");
+            logger.warn("Trying to recreate a default 'filtpick.json'...");
             writeDefaultConfig();
         } catch (IllegalConfigStructure e) {
             logger.error(e);
-            logger.info("Trying to recreate a default 'filtpick.json'...");
+            logger.warn("Trying to recreate a default 'filtpick.json'...");
             writeDefaultConfig();
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -175,13 +176,14 @@ public final class FPConfigManager {
     public static class WidgetOffsetConfig implements Adaptable<WidgetOffsetConfig> {
 
         public enum Key {
+            RECIPE_BUTTON,
             ENTRY_BUTTON,
             FILT_MODE_BUTTON,
             DESTRUCTION_MODE_BUTTON,
             CLEAR_BUTTON,
-            RETURN_BUTTON;
+            RETURN_BUTTON
         }
-        private Map<Key, WidgetPosOffset> configMap = new HashMap<>();
+        private final Map<Key, WidgetPosOffset> configMap = new TreeMap<>();
 
         /**
          * Do not use this. This is specially to server Gson deserialization.
@@ -228,7 +230,10 @@ public final class FPConfigManager {
                 public WidgetOffsetConfig read(JsonReader in) throws IOException {
                     in.beginObject();
                     for (Key key : Key.values()) {
-                        in.nextName();
+                        String readKey = in.nextName();
+                        if (!readKey.equals(key.name())) {
+                            throw new IllegalConfigStructure(String.format("Fail to read widget offset config. The key is unmatched. Need key '%s' but read '%s'.", key.name(), readKey));
+                        }
                         configMap.put(key, WidgetPosOffset.DEFAULT.getTypeAdapter().read(in));
                     }
                     in.endObject();

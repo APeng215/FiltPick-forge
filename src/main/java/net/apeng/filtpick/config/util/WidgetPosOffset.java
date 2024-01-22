@@ -1,4 +1,4 @@
-package net.apeng.filtpick.config;
+package net.apeng.filtpick.config.util;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;
