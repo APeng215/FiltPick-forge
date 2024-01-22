@@ -1,12 +1,16 @@
 package net.apeng.filtpick.config;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
+import net.apeng.filtpick.config.gson.Adaptable;
+import net.apeng.filtpick.config.gson.IllegalConfigStructure;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
@@ -20,20 +24,77 @@ public final class FPConfigManager {
     private static FPConfigManager INSTANCE;
     private static final int EOF = -1;
     private static final Logger logger = LogManager.getLogger();
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson gson
+            = new GsonBuilder()
+            .registerTypeAdapter(WidgetOffsetConfig.class, WidgetOffsetConfig.ofDefault().getTypeAdapter())
+            .registerTypeAdapter(WidgetPosOffset.class, WidgetPosOffset.DEFAULT.getTypeAdapter())
+            .setPrettyPrinting()
+            .create();
     private FileChannel fileChannel;
     private WidgetOffsetConfig widgetOffsetConfig;
 
     private FPConfigManager(Path configDirPath) {
         initFileChannel(configDirPath);
         if (isFileEmpty()) {
-            widgetOffsetConfig = new WidgetOffsetConfig();
-            try2Write2ConfigFile(gson.toJson(widgetOffsetConfig.configMap));
-            return;
+            writeDefaultConfig();
+        } else {
+            readConfig();
         }
-        // TODO
     }
 
+    public WidgetPosOffset getWidgetPosOffset(WidgetOffsetConfig.Key key) {
+        nullCheck4ConfigKey(key);
+        return widgetOffsetConfig.getWidgetPosOffset(key);
+    }
+
+    private static void nullCheck4ConfigKey(WidgetOffsetConfig.Key key) {
+        if (key == null) {
+            throw new NullPointerException("Fail to get widget position offset for configuration. Enum Key is null.");
+        }
+    }
+
+    /**
+     * Get singleton for FPConfigManager.
+     * @return the singleton.
+     */
+    public static FPConfigManager getInstance() {
+        nullCheck4Instance();
+        return INSTANCE;
+    }
+
+    /**
+     * Get the singleton for FPConfigManager.
+     * If the config file doesn't exist, it will be created automatically.
+     * @param configDirPath the configuration directory path.
+     * @return the singleton
+     */
+    public static FPConfigManager getInstance(Path configDirPath) {
+        initInstance(configDirPath);
+        return INSTANCE;
+    }
+
+    private void readConfig() {
+        try {
+            widgetOffsetConfig = gson.fromJson(readFullConfigFile(), WidgetOffsetConfig.class);
+        } catch (JsonSyntaxException e) {
+            logger.error(e);
+            logger.error("The json syntax for file 'filtpick.json' is illegal.");
+            logger.info("Trying to recreate a default 'filtpick.json'...");
+            writeDefaultConfig();
+        } catch (IllegalConfigStructure e) {
+            logger.error(e);
+            logger.info("Trying to recreate a default 'filtpick.json'...");
+            writeDefaultConfig();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    private void writeDefaultConfig() {
+        widgetOffsetConfig = WidgetOffsetConfig.ofDefault();
+        try2Write2ConfigFile(gson.toJson(widgetOffsetConfig.configMap));
+    }
 
 
     private boolean isFileEmpty() {
@@ -71,13 +132,13 @@ public final class FPConfigManager {
     }
 
     private String readFullConfigFile() throws IOException {
+        resetChannelPosition();
         ByteBuffer buffer = ByteBuffer.allocate(256);
         StringBuilder stringBuilder = new StringBuilder();
-        resetChannelPosition();
         while (fileChannel.read(buffer) != EOF) {
-            while (buffer.hasRemaining()) {
-                stringBuilder.append(buffer.getChar());
-            }
+            buffer.flip();
+            stringBuilder.append(Charset.defaultCharset().decode(buffer));
+            buffer.clear();
         }
         return stringBuilder.toString();
     }
@@ -101,29 +162,6 @@ public final class FPConfigManager {
         }
     }
 
-    /**
-     * Get singleton for FPConfigManager.
-     * @return the singleton.
-     */
-    public static FPConfigManager getInstance() {
-        nullCheck4Instance();
-        return INSTANCE;
-    }
-
-    /**
-     * Get the singleton for FPConfigManager.
-     * If the config file doesn't exist, it will be created automatically.
-     * @param configDirPath the configuration directory path.
-     * @return the singleton
-     */
-    public static FPConfigManager getInstance(Path configDirPath) {
-        if (INSTANCE != null){
-            return INSTANCE;
-        }
-        initInstance(configDirPath);
-        return INSTANCE;
-    }
-
     private static void initInstance(Path configDirPath) {
         INSTANCE = new FPConfigManager(configDirPath);
     }
@@ -134,34 +172,71 @@ public final class FPConfigManager {
         }
     }
 
-    private static class WidgetOffsetConfig {
+    public static class WidgetOffsetConfig implements Adaptable<WidgetOffsetConfig> {
 
-        private enum Key {
+        public enum Key {
             ENTRY_BUTTON,
             FILT_MODE_BUTTON,
             DESTRUCTION_MODE_BUTTON,
             CLEAR_BUTTON,
             RETURN_BUTTON;
         }
+        private Map<Key, WidgetPosOffset> configMap = new HashMap<>();
 
-        private final Map<Key, WidgetPosOffset> configMap = new HashMap<>();
+        /**
+         * Do not use this. This is specially to server Gson deserialization.
+         */
+        private WidgetOffsetConfig() {}
 
         /**
          * Return new WidgetOffsetConfig with default values initialized.
+         * @return the new WidgetOffsetConfig with default values initialized
          */
-        private WidgetOffsetConfig() {
-            setDefaultValues();
+        private static WidgetOffsetConfig ofDefault() {
+            return new WidgetOffsetConfig().setDefaultValues();
         }
 
-        private void setDefaultValues() {
+        private WidgetOffsetConfig setDefaultValues() {
             for (Key key : Key.values()) {
                 configMap.put(key, WidgetPosOffset.DEFAULT);
             }
+            return this;
+        }
+
+        private WidgetPosOffset getWidgetPosOffset(Key key) {
+            return configMap.get(key);
         }
 
         private void setOffset(Key key, WidgetPosOffset offset) {
             configMap.put(key, offset);
         }
-    }
 
+        @Override
+        public TypeAdapter<WidgetOffsetConfig> getTypeAdapter() {
+            return new TypeAdapter<WidgetOffsetConfig>() {
+                @Override
+                public void write(JsonWriter out, WidgetOffsetConfig value) throws IOException {
+                    out.beginObject();
+                    for (Map.Entry<Key, WidgetPosOffset> entry : configMap.entrySet()) {
+                        out.name(entry.getKey().toString());
+                        entry.getValue().getTypeAdapter().write(out, entry.getValue());
+                    }
+                    out.endObject();
+                }
+
+                @Override
+                public WidgetOffsetConfig read(JsonReader in) throws IOException {
+                    in.beginObject();
+                    for (Key key : Key.values()) {
+                        in.nextName();
+                        configMap.put(key, WidgetPosOffset.DEFAULT.getTypeAdapter().read(in));
+                    }
+                    in.endObject();
+                    return WidgetOffsetConfig.this;
+                }
+            }.nullSafe();
+        }
+
+
+    }
 }

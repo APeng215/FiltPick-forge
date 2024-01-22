@@ -2,6 +2,7 @@ package net.apeng.filtpick.gui.screen;
 
 
 import net.apeng.filtpick.FiltPick;
+import net.apeng.filtpick.config.FPConfigManager;
 import net.apeng.filtpick.gui.util.LegacyTexturedButtonWidget;
 import net.apeng.filtpick.util.IntBoolConvertor;
 import net.minecraft.ChatFormatting;
@@ -58,19 +59,43 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
     }
 
     private void addFiltModeButton() {
-        filtModeButton = new FPToggleButton(this.leftPos + 10, this.topPos + 4, 12, 11, FILT_MODE_BUTTON_TEXTURE, WHITELIST_MODE_BUTTON_ID);
+        filtModeButton = new FPToggleButton(
+                this.leftPos + 10 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.FILT_MODE_BUTTON).xOffset(),
+                this.topPos + 4 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.FILT_MODE_BUTTON).yOffset(),
+                12,
+                11,
+                FILT_MODE_BUTTON_TEXTURE,
+                WHITELIST_MODE_BUTTON_ID
+        );
         filtModeButton.setTooltips(Component.translatable("whitelist_mode").append("\n").withStyle(ChatFormatting.DARK_GREEN).append(Component.translatable("whitelist_mode_explanation").withStyle(EXPLANATION_STYLE)), Component.translatable("blacklist_mode").append("\n").withStyle(ChatFormatting.DARK_RED).append(Component.translatable("blacklist_mode_explanation").withStyle(EXPLANATION_STYLE)));
         addRenderableWidget(filtModeButton);
     }
 
     private void addDestructionButton() {
-        destructionButton = new FPToggleButton(this.leftPos + 10 + 2 + 12, this.topPos + 4, 12, 11, DESTRUCTION_BUTTON_TEXTURE, DESTRUCTION_MODE_BUTTON_ID);
+        destructionButton = new FPToggleButton(
+                this.leftPos + 10 + 2 + 12 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.DESTRUCTION_MODE_BUTTON).xOffset(),
+                this.topPos + 4 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.DESTRUCTION_MODE_BUTTON).yOffset(),
+                12,
+                11,
+                DESTRUCTION_BUTTON_TEXTURE,
+                DESTRUCTION_MODE_BUTTON_ID
+        );
         destructionButton.setTooltips(Component.translatable("destruction_mode_on").withStyle(ChatFormatting.DARK_RED).append("\n").append(Component.translatable("destruction_mode_on_explanation").withStyle(EXPLANATION_STYLE)), Component.translatable("destruction_mode_off").withStyle(ChatFormatting.DARK_GRAY));
         addRenderableWidget(destructionButton);
     }
 
     private void addClearButton() {
-        clearButton = new LegacyTexturedButtonWidget(this.leftPos + 154 - 14, this.topPos + 4, 12, 11, 0, 0, 12, CLEAR_BUTTON_TEXTURE, button -> sendButtonClickC2SPacket(CLEAR_BUTTON_ID));
+        clearButton = new LegacyTexturedButtonWidget(
+                this.leftPos + 154 - 14 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.CLEAR_BUTTON).xOffset(),
+                this.topPos + 4 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.CLEAR_BUTTON).yOffset(),
+                12,
+                11,
+                0,
+                0,
+                12,
+                CLEAR_BUTTON_TEXTURE,
+                button -> sendButtonClickC2SPacket(CLEAR_BUTTON_ID)
+        );
         setTooltip2ClearButton();
         addRenderableWidget(clearButton);
     }
@@ -81,7 +106,19 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
     }
 
     private void addReturnButton() {
-        returnButton = new LegacyTexturedButtonWidget(this.leftPos + 154, this.topPos + 4, 12, 11, 0, 0, 12, RETURN_BUTTON_TEXTURE, 12, 11 * 2 + 1, button -> minecraft.setScreen(new InventoryScreen(minecraft.player)));
+        returnButton = new LegacyTexturedButtonWidget(
+                this.leftPos + 154 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.RETURN_BUTTON).xOffset(),
+                this.topPos + 4 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.RETURN_BUTTON).yOffset(),
+                12,
+                11,
+                0,
+                0,
+                12,
+                RETURN_BUTTON_TEXTURE,
+                12,
+                11 * 2 + 1,
+                button -> minecraft.setScreen(new InventoryScreen(minecraft.player))
+        );
         addRenderableWidget(returnButton);
 
     }

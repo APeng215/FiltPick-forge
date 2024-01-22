@@ -1,6 +1,7 @@
 package net.apeng.filtpick.mixin;
 
 import net.apeng.filtpick.FiltPick;
+import net.apeng.filtpick.config.FPConfigManager;
 import net.apeng.filtpick.gui.util.LegacyTexturedButtonWidget;
 import net.apeng.filtpick.network.NetworkHandler;
 import net.apeng.filtpick.network.OpenFiltPickScreenC2SPacket;
@@ -28,19 +29,12 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(InventoryScreen.class)
 public abstract class InventoryScreenMixin extends EffectRenderingInventoryScreen<InventoryMenu> implements RecipeUpdateListener {
 
-    @Final
     @Shadow
-    private RecipeBookComponent recipeBookComponent;
-
+    private @Final RecipeBookComponent recipeBookComponent;
     @Unique
     private static final ResourceLocation FILTPICK_ENTRY_TEXTURE = ResourceLocation.tryBuild(FiltPick.ID, "gui/entry_button.png");
-
-    @Unique
-    private final static int deviationOfFiltPickButton = 23;
-
     @Unique
     private ImageButton recipeBookButton;
-
     @Unique
     private ImageButton filtPickEntryButton;
 
@@ -78,14 +72,24 @@ public abstract class InventoryScreenMixin extends EffectRenderingInventoryScree
             this.leftPos = recipeBookComponent.updateScreenPosition(this.width, this.imageWidth);
             button.setPosition(this.leftPos + 104, this.height / 2 - 22);
             recipeBookButton.setPosition(this.leftPos + 104 , this.height / 2 - 22);
-            filtPickEntryButton.setPosition(this.leftPos + 104 + deviationOfFiltPickButton, this.height / 2 - 22);
+            filtPickEntryButton.setPosition(getFiltPickEntryButtonPosX(), getFiltPickEntryButtonPosY());
         });
     }
 
     @Unique
     private void initFiltPickEntryButton() {
-        filtPickEntryButton = new LegacyTexturedButtonWidget(this.leftPos + 104 + deviationOfFiltPickButton, this.height / 2 - 22, 20, 18, 0, 0, 19, FILTPICK_ENTRY_TEXTURE, button -> NetworkHandler.send2Server(new OpenFiltPickScreenC2SPacket()));
+        filtPickEntryButton = new LegacyTexturedButtonWidget(getFiltPickEntryButtonPosX(), getFiltPickEntryButtonPosY(), 20, 18, 0, 0, 19, FILTPICK_ENTRY_TEXTURE, button -> NetworkHandler.send2Server(new OpenFiltPickScreenC2SPacket()));
         setTooltip2EntryButton();
+    }
+
+    @Unique
+    private int getFiltPickEntryButtonPosX() {
+        return this.leftPos + 104 + 23 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.ENTRY_BUTTON).xOffset();
+    }
+
+    @Unique
+    private int getFiltPickEntryButtonPosY() {
+        return this.height / 2 - 22 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.ENTRY_BUTTON).yOffset();
     }
 
     @Unique
