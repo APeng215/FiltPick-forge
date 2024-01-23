@@ -3,7 +3,7 @@ package net.apeng.filtpick.gui.screen;
 
 import net.apeng.filtpick.FiltPick;
 import net.apeng.filtpick.config.FPConfigManager;
-import net.apeng.filtpick.gui.util.LegacyTexturedButtonWidget;
+import net.apeng.filtpick.gui.widget.LegacyTexturedButton;
 import net.apeng.filtpick.util.IntBoolConvertor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
@@ -38,7 +38,7 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
     private static final ResourceLocation RETURN_BUTTON_TEXTURE = ResourceLocation.tryBuild(FiltPick.ID, "gui/return_button.png");
 
     private FPToggleButton filtModeButton, destructionButton;
-    private LegacyTexturedButtonWidget clearButton, returnButton;
+    private LegacyTexturedButton clearButton, returnButton;
 
     public FiltPickScreen(FiltPickMenu handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
@@ -85,7 +85,7 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
     }
 
     private void addClearButton() {
-        clearButton = new LegacyTexturedButtonWidget(
+        clearButton = new LegacyTexturedButton(
                 this.leftPos + 154 - 14 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.CLEAR_BUTTON).xOffset(),
                 this.topPos + 4 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.CLEAR_BUTTON).yOffset(),
                 12,
@@ -106,7 +106,7 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
     }
 
     private void addReturnButton() {
-        returnButton = new LegacyTexturedButtonWidget(
+        returnButton = new LegacyTexturedButton(
                 this.leftPos + 154 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.RETURN_BUTTON).xOffset(),
                 this.topPos + 4 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.RETURN_BUTTON).yOffset(),
                 12,
@@ -188,33 +188,16 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
                 return;
             }
             renderTexture(context);
-            applyTooltip();
+            renderTooltip();
         }
 
-        /**
-         * Similar to AbstractWidget#updateTooltip but support toggling
-         */
-        private void applyTooltip() {
-            if (this.tureTooltip == null || this.falseTooltip == null) {
-                return;
+        private void renderTooltip() {
+            if(correspondPropertyTrue() && tureTooltip != null) {
+                tureTooltip.refreshTooltipForNextRenderPass(isHovered(), isFocused(), getRectangle());
             }
-            boolean flag = this.isHovered || this.isFocused() && Minecraft.getInstance().getLastInputType().isKeyboard();
-            if (flag != this.wasHoveredOrFocused) {
-                if (flag) {
-                    this.hoverOrFocusedStartTime = Util.getMillis();
-                }
-
-                this.wasHoveredOrFocused = flag;
+            if (!correspondPropertyTrue() && falseTooltip != null) {
+                falseTooltip.refreshTooltipForNextRenderPass(isHovered(), isFocused(), getRectangle());
             }
-
-            if (flag && Util.getMillis() - this.hoverOrFocusedStartTime > (long) this.tooltipMsDelay) {
-                Screen screen = Minecraft.getInstance().screen;
-                if (screen != null) {
-                    screen.setTooltipForNextRenderPass(this.correspondPropertyTrue() ? this.tureTooltip : this.falseTooltip, this.createTooltipPositioner(), this.isFocused());
-                }
-            }
-
-
         }
 
 

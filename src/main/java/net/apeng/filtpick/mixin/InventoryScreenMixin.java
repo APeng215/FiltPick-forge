@@ -2,7 +2,7 @@ package net.apeng.filtpick.mixin;
 
 import net.apeng.filtpick.FiltPick;
 import net.apeng.filtpick.config.FPConfigManager;
-import net.apeng.filtpick.gui.util.LegacyTexturedButtonWidget;
+import net.apeng.filtpick.gui.widget.LegacyTexturedButton;
 import net.apeng.filtpick.network.NetworkHandler;
 import net.apeng.filtpick.network.OpenFiltPickScreenC2SPacket;
 import net.minecraft.ChatFormatting;
@@ -82,7 +82,7 @@ public abstract class InventoryScreenMixin extends EffectRenderingInventoryScree
     @Unique
     private void initFiltPickEntryButton() {
         calculateEntryButtonPos();
-        filtPickEntryButton = new LegacyTexturedButtonWidget(filtPickEntryButtonPosX, filtPickEntryButtonPosY, 20, 18, 0, 0, 19, FILTPICK_ENTRY_TEXTURE, button -> NetworkHandler.send2Server(new OpenFiltPickScreenC2SPacket()));
+        filtPickEntryButton = new LegacyTexturedButton(filtPickEntryButtonPosX, filtPickEntryButtonPosY, 20, 18, 0, 0, 19, FILTPICK_ENTRY_TEXTURE, button -> NetworkHandler.send2Server(new OpenFiltPickScreenC2SPacket()));
         setTooltip2EntryButton();
     }
 

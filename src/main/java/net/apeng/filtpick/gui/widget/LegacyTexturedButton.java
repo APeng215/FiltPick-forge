@@ -1,4 +1,4 @@
-package net.apeng.filtpick.gui.util;
+package net.apeng.filtpick.gui.widget;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -7,7 +7,7 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
-public class LegacyTexturedButtonWidget extends ImageButton {
+public class LegacyTexturedButton extends ImageButton {
     private final int u;
     private final int v;
     private final int hoveredVOffset;
@@ -17,15 +17,15 @@ public class LegacyTexturedButtonWidget extends ImageButton {
     private final int textureWidth;
     private final int textureHeight;
 
-    public LegacyTexturedButtonWidget(int x, int y, int width, int height, int u, int v, int hoveredVOffset, ResourceLocation texture, int textureWidth, int textureHeight, Button.OnPress pressAction) {
+    public LegacyTexturedButton(int x, int y, int width, int height, int u, int v, int hoveredVOffset, ResourceLocation texture, int textureWidth, int textureHeight, Button.OnPress pressAction) {
         this(x, y, width, height, u, v, hoveredVOffset, texture, textureWidth, textureHeight, pressAction, CommonComponents.EMPTY);
     }
-    public LegacyTexturedButtonWidget(int x, int y, int width, int height, int u, int v, int hoveredVOffset, ResourceLocation texture, Button.OnPress pressAction) {
+    public LegacyTexturedButton(int x, int y, int width, int height, int u, int v, int hoveredVOffset, ResourceLocation texture, Button.OnPress pressAction) {
         this(x, y, width, height, u, v, hoveredVOffset, texture, 256, 256, pressAction, CommonComponents.EMPTY);
     }
 
 
-    public LegacyTexturedButtonWidget(int x, int y, int width, int height, int u, int v, int hoveredVOffset, ResourceLocation texture, int textureWidth, int textureHeight, Button.OnPress pressAction, Component message) {
+    public LegacyTexturedButton(int x, int y, int width, int height, int u, int v, int hoveredVOffset, ResourceLocation texture, int textureWidth, int textureHeight, Button.OnPress pressAction, Component message) {
         super(x, y, width, height, null, pressAction, message);
 
         this.u = u;
