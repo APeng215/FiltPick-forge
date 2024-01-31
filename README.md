@@ -30,18 +30,6 @@ Actually, the UI is too straightforward to require any guidance. I recommend try
 You can configure button position in `/config/filtpick.json`.<br>
 _Normally, there is no necessity to make any configuration except for mods conflicts._
 
-## For developer
-
-If you want to build the source project, 
-remember to delete the proxy settings in file `gradle.properties`.
-```
-# Used for proxy of the author, delete it if you are not the author.
-systemProp.http.proxyHost=127.0.0.1
-systemProp.http.proxyPort=10809
-systemProp.https.proxyHost=127.0.0.1
-systemProp.https.proxyPort=10809
-```
-
 ## Credits
 
 ### Localization
