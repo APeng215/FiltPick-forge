@@ -8,6 +8,7 @@ import net.apeng.filtpick.gui.util.ExtendedMenuProvider;
 import net.apeng.filtpick.property.FiltListPropertyDelegate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
@@ -29,6 +30,8 @@ public abstract class ServerPlayerEntityMixin extends Player implements FiltList
     @Shadow public abstract void closeContainer();
 
     @Shadow public abstract void doCloseContainer();
+
+    @Shadow public abstract ServerLevel serverLevel();
 
     @Unique
     private SimpleContainer filtList = new SimpleContainer(27);
@@ -74,7 +77,7 @@ public abstract class ServerPlayerEntityMixin extends Player implements FiltList
 
     @Unique
     private void readFiltList(CompoundTag nbt) {
-        this.filtList.fromTag(nbt.getList("FiltList", 10));
+        this.filtList.fromTag(nbt.getList("FiltList", 10), this.registryAccess());
     }
 
     @Unique
@@ -85,7 +88,7 @@ public abstract class ServerPlayerEntityMixin extends Player implements FiltList
 
     @Unique
     private void writeFiltList(CompoundTag nbt) {
-        nbt.put("FiltList", this.filtList.createTag());
+        nbt.put("FiltList", this.filtList.createTag(this.registryAccess()));
     }
 
     @Unique

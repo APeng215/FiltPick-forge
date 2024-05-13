@@ -12,6 +12,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.WidgetTooltipHolder;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -24,6 +25,8 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ContainerData;
+
+import java.time.Duration;
 
 public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
 
@@ -102,7 +105,7 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
 
     private void setTooltip2ClearButton() {
         clearButton.setTooltip(Tooltip.create(Component.translatable("reset_explanation").withStyle(EXPLANATION_STYLE)));
-        clearButton.setTooltipDelay(500);
+        clearButton.setTooltipDelay(Duration.ofMillis(500));
     }
 
     private void addReturnButton() {
@@ -170,7 +173,8 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
         private final ContainerData propertyDelegate = menu.getPropertyDelegate();
         private final int buttonId;
         private final ResourceLocation texture;
-        private Tooltip tureTooltip, falseTooltip;
+        private final WidgetTooltipHolder tureTooltip = new WidgetTooltipHolder();
+        private final WidgetTooltipHolder falseTooltip = new WidgetTooltipHolder();
 
         public FPToggleButton(int x, int y, int width, int height, ResourceLocation texture, int buttonId) {
             this(x, y, width, height, Component.empty(), texture, buttonId);
@@ -251,8 +255,8 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
         }
 
         public void setTooltips(Component tureTooltip, Component falseTooltip) {
-            this.tureTooltip = Tooltip.create(tureTooltip);
-            this.falseTooltip = Tooltip.create(falseTooltip);
+            this.tureTooltip.set(Tooltip.create(tureTooltip));
+            this.falseTooltip.set(Tooltip.create(falseTooltip));
         }
     }
 

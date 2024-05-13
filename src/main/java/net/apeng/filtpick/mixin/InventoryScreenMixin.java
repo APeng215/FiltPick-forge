@@ -26,6 +26,8 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.time.Duration;
+
 @Mixin(InventoryScreen.class)
 public abstract class InventoryScreenMixin extends EffectRenderingInventoryScreen<InventoryMenu> implements RecipeUpdateListener {
 
@@ -107,7 +109,7 @@ public abstract class InventoryScreenMixin extends EffectRenderingInventoryScree
     @Unique
     private void setTooltip2EntryButton() {
         filtPickEntryButton.setTooltip(Tooltip.create(Component.translatable("filtpick_screen_name").withStyle(ChatFormatting.YELLOW).append(": ").append(Component.translatable("entry_button_tooltip"))));
-        filtPickEntryButton.setTooltipDelay(500);
+        filtPickEntryButton.setTooltipDelay(Duration.ofMillis(500));
     }
 
 }

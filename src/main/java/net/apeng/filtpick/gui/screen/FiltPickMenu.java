@@ -13,7 +13,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-import org.jetbrains.annotations.NotNull;
+
+import java.util.Set;
 
 public class FiltPickMenu extends AbstractContainerMenu {
 
@@ -46,13 +47,6 @@ public class FiltPickMenu extends AbstractContainerMenu {
 
     private static boolean inventorySlotClicked(int slotIndex) {
         return slotIndex < 36;
-    }
-
-    public static boolean canItemStacksStack(@NotNull ItemStack a, @NotNull ItemStack b) {
-        if (a.isEmpty() || !ItemStack.isSameItem(a, b) || a.hasTag() != b.hasTag())
-            return false;
-
-        return (!a.hasTag() || a.getTag().equals(b.getTag()));
     }
 
     private void addSlots(Inventory playerInventory, Container filtList) {
@@ -108,25 +102,44 @@ public class FiltPickMenu extends AbstractContainerMenu {
 
     @Override
     public ItemStack quickMoveStack(Player playerIn, int index) {
-        if (inventorySlotClicked(index)) {
-            ItemStack stackToInsert = playerInventory.getItem(index);
-            for (int i = 0; i < filtList.getContainerSize(); i++) {
-                ItemStack stack = filtList.getItem(i);
-                if (!allowRepeats() && canItemStacksStack(stack, stackToInsert))
-                    break;
-                if (stack.isEmpty()) {
-                    ItemStack copy = stackToInsert.copy();
-                    copy.setCount(1);
-                    filtList.setItem(i, copy);
-                    markSlotDirty(i + 36);
-                    break;
-                }
-            }
+        ItemStack stack2Move = playerInventory.getItem(index);
+        if (stack2Move.isEmpty()) return ItemStack.EMPTY;
+        if (isInventorySlotClicked(index)) {
+            tryAddItem2FiltList(stack2Move);
         } else {
-            setFiltStackEmpty(index - 36);
-            markSlotDirty(index);
+            deleteItemFromFiltList(index);
         }
-        return ItemStack.EMPTY;
+        return ItemStack.EMPTY; // To cancel infinite invoking
+    }
+
+    private void deleteItemFromFiltList(int index) {
+        setFiltStackEmpty(index - 36);
+        markSlotDirty(index);
+    }
+
+    private static boolean isInventorySlotClicked(int slotIndex) {
+        return slotIndex < 36;
+    }
+
+    private void tryAddItem2FiltList(ItemStack stack2Move) {
+        if (isFiltListAlreadyContainItem(stack2Move)) return;
+        addItem2FiltList(stack2Move);
+    }
+
+    private boolean isFiltListAlreadyContainItem(ItemStack stack2Move) {
+        return filtList.hasAnyOf(Set.of(stack2Move.getItem()));
+    }
+
+    private void addItem2FiltList(ItemStack stack2Move) {
+        ItemStack singleItemStack2Add = stack2Move.getItem().getDefaultInstance();
+        for (int i = 0; i < filtList.getContainerSize(); i++) {
+            ItemStack targetStack = filtList.getItem(i);
+            if (targetStack.isEmpty()) {
+                filtList.setItem(i, singleItemStack2Add);
+                markSlotDirty(i + 36);
+                return;
+            }
+        }
     }
 
     /**
@@ -171,10 +184,6 @@ public class FiltPickMenu extends AbstractContainerMenu {
     @Override
     public boolean stillValid(Player player) {
         return true;
-    }
-
-    protected boolean allowRepeats() {
-        return false;
     }
 
     /**
