@@ -120,7 +120,10 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
                 RETURN_BUTTON_TEXTURE,
                 12,
                 11 * 2 + 1,
-                button -> minecraft.setScreen(new InventoryScreen(minecraft.player))
+                button -> {
+                    this.onClose();
+                    minecraft.setScreen(new InventoryScreen(minecraft.player));
+                }
         );
         addRenderableWidget(returnButton);
 
