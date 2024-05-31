@@ -20,6 +20,7 @@ import net.minecraftforge.registries.RegistryObject;
 public class FiltMenu extends AbstractContainerMenu {
 
     public static final DeferredRegister<MenuType<?>> REGISTER = DeferredRegister.create(ForgeRegistries.MENU_TYPES, FiltPick.MOD_ID);
+    public static final RegistryObject<MenuType<FiltMenu>> MENU_TYPE = REGISTER.register("filt_screen", () -> IForgeMenuType.create(FiltMenu::new));
     private final ItemStackHandler ghostInventory;
     private final Inventory playerInventory;
 
@@ -52,9 +53,7 @@ public class FiltMenu extends AbstractContainerMenu {
                 this.addSlot(new SlotItemHandler(dataInventory, i * 9 + j, 8 + j * 18, 18 + i * 18));
             }
         }
-
-
-    }    public static final RegistryObject<MenuType<FiltMenu>> MENU_TYPE = REGISTER.register("filt_screen", () -> IForgeMenuType.create(FiltMenu::new));
+    }
 
     protected boolean allowRepeats() {
         return false;
