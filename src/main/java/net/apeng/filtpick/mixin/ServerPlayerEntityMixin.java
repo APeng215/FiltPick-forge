@@ -26,15 +26,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(ServerPlayer.class)
 public abstract class ServerPlayerEntityMixin extends Player implements FiltListContainer {
 
-    @Shadow public abstract void closeContainer();
-
-    @Shadow public abstract void doCloseContainer();
-
     @Unique
     private SimpleContainer filtList = new SimpleContainer(27);
 
     @Unique
     private FiltListPropertyDelegate filtListPropertyDelegate = new FiltListPropertyDelegate();
+
+    @Shadow public abstract void closeContainer();
+
+    @Shadow public abstract void doCloseContainer();
 
     public ServerPlayerEntityMixin(Level world, BlockPos pos, float yaw, GameProfile gameProfile) {
         super(world, pos, yaw, gameProfile);
