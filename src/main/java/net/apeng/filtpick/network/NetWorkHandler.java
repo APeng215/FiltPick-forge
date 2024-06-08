@@ -29,6 +29,13 @@ public class NetWorkHandler {
                 OpenFiltPickScreenC2SPacket::new,
                 OpenFiltPickScreenC2SPacket::handle
         );
+        INSTANCE.registerMessage(
+                id(),
+                SynMenuFieldC2SPacket.class,
+                SynMenuFieldC2SPacket::encode,
+                SynMenuFieldC2SPacket::new,
+                SynMenuFieldC2SPacket::handle
+        );
     }
 
     public static <MSG> void send2Server(MSG message) {

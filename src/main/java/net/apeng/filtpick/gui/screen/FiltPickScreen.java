@@ -1,9 +1,14 @@
 package net.apeng.filtpick.gui.screen;
 
+// TODO synchronize menu slots for both client side and server side,
+//  which means reset slots for both sides.
 
 import net.apeng.filtpick.FiltPick;
 import net.apeng.filtpick.config.FPConfigManager;
 import net.apeng.filtpick.gui.util.LegacyTexturedButtonWidget;
+import net.apeng.filtpick.gui.util.ScrollBar;
+import net.apeng.filtpick.network.NetWorkHandler;
+import net.apeng.filtpick.network.SynMenuFieldC2SPacket;
 import net.apeng.filtpick.util.IntBoolConvertor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
@@ -39,6 +44,7 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
 
     private FPToggleButton filtModeButton, destructionButton;
     private LegacyTexturedButtonWidget clearButton, returnButton;
+    private ScrollBar scrollBar;
 
     public FiltPickScreen(FiltPickMenu handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
@@ -49,6 +55,16 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
         super.init();
         setTitlePosition();
         addButtons();
+        addScrollBar();
+    }
+
+    private void addScrollBar() {
+        scrollBar = new ScrollBar(
+                this.leftPos + 170,
+                this.topPos + 4,
+                80
+        );
+        this.addRenderableWidget(scrollBar);
     }
 
     private void addButtons() {
@@ -56,6 +72,30 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
         addDestructionButton();
         addClearButton();
         addReturnButton();
+    }
+
+    @Override
+    public boolean mouseScrolled(double pMouseX, double pMouseY, double pDelta) {
+        if (scrollBar.mouseScrolled(pMouseX, pMouseY, pDelta)) {
+            // TODO
+            if (pDelta > 0) {
+                this.menu.setDisplayedRowStartIndexAndUpdate(0);
+                NetWorkHandler.send2Server(new SynMenuFieldC2SPacket(0));
+            } else {
+                this.menu.setDisplayedRowStartIndexAndUpdate(1);
+                NetWorkHandler.send2Server(new SynMenuFieldC2SPacket(1));
+            }
+            return true;
+        }
+        return super.mouseScrolled(pMouseX, pMouseY, pDelta);
+    }
+
+    @Override
+    public boolean mouseDragged(double pMouseX, double pMouseY, int pButton, double pDragX, double pDragY) {
+        if (this.getFocused() != null && this.isDragging() && pButton == 0 && this.getFocused().mouseDragged(pMouseX, pMouseY, pButton, pDragX, pDragY)) {
+            return true;
+        }
+        return super.mouseDragged(pMouseX, pMouseY, pButton, pDragX, pDragY);
     }
 
     private void addFiltModeButton() {
@@ -94,7 +134,10 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
                 0,
                 12,
                 CLEAR_BUTTON_TEXTURE,
-                button -> sendButtonClickC2SPacket(CLEAR_BUTTON_ID)
+                button -> {
+                    sendButtonClickC2SPacket(CLEAR_BUTTON_ID);
+                    menu.clearFiltList();
+                }
         );
         setTooltip2ClearButton();
         addRenderableWidget(clearButton);

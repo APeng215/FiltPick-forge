@@ -8,6 +8,9 @@ import net.minecraft.world.SimpleContainer;
  */
 public interface FiltListContainer {
 
+    int CAPACITY = 27 * 4;
+    int ROW_NUM = CAPACITY / 9;
+
     SimpleContainer getFiltList();
 
     FiltListPropertyDelegate getFiltListPropertyDelegate();
@@ -15,6 +18,6 @@ public interface FiltListContainer {
     /**
      * Reset filtlist and its properties
      */
-    void resetFiltListWithProperties();
+    void resetFiltListAndProperties();
 
 }

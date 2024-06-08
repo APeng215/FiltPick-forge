@@ -27,7 +27,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class ServerPlayerEntityMixin extends Player implements FiltListContainer {
 
     @Unique
-    private SimpleContainer filtList = new SimpleContainer(27);
+    private SimpleContainer filtList = new SimpleContainer(FiltListContainer.CAPACITY);
 
     @Unique
     private FiltListPropertyDelegate filtListPropertyDelegate = new FiltListPropertyDelegate();
@@ -115,7 +115,7 @@ public abstract class ServerPlayerEntityMixin extends Player implements FiltList
     }
 
     @Override
-    public void resetFiltListWithProperties() {
+    public void resetFiltListAndProperties() {
         getFiltList().clearContent();
         getFiltListPropertyDelegate().reset();
     }

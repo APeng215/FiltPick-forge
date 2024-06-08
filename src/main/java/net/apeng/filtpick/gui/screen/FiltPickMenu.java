@@ -19,13 +19,15 @@ public class FiltPickMenu extends AbstractContainerMenu {
 
     public static final DeferredRegister<MenuType<?>> REGISTER = DeferredRegister.create(ForgeRegistries.MENU_TYPES, FiltPick.ID);
     public static final RegistryObject<MenuType<FiltPickMenu>> TYPE = REGISTER.register("filt_menu", () -> new MenuType(FiltPickMenu::new, FeatureFlags.DEFAULT_FLAGS));
+    private static final int FILTPICK_ROW_NUM = 3;
     private final ContainerData propertyDelegate;
     private final Inventory playerInventory;
     private final Container filtList;
+    private int displayedRowStartIndex = 0;
 
     // For client side
     public FiltPickMenu(int syncId, Inventory playerInventory) {
-        this(syncId, playerInventory, new SimpleContainer(27), new SimpleContainerData(2));
+        this(syncId, playerInventory, new SimpleContainer(FiltListContainer.CAPACITY), new SimpleContainerData(2));
     }
 
     // For server side        
@@ -39,8 +41,14 @@ public class FiltPickMenu extends AbstractContainerMenu {
         addDataSlots(propertyDelegate);
     }
 
+    private void clearAllSlots() {
+        this.slots.clear();
+        this.remoteSlots.clear();
+        this.lastSlots.clear();
+    }
+
     private static void checkSize(Container filtList, ContainerData propertyDelegate) {
-        checkContainerSize(filtList, 27);
+        checkContainerSize(filtList, FiltListContainer.CAPACITY);
         checkContainerDataCount(propertyDelegate, 2);
     }
 
@@ -55,11 +63,34 @@ public class FiltPickMenu extends AbstractContainerMenu {
         return (!a.hasTag() || a.getTag().equals(b.getTag()));
     }
 
+    private void updateSlots() {
+        clearAllSlots();
+        addSlots(playerInventory, filtList);
+    }
+
+    /**
+     * Set displayed row start index and update the slots render.
+     * Should be used for both side to maintain slot consistency.
+     * @param displayedRowStartIndex the row index fot the first row of displayed filtlist
+     * @exception IndexOutOfBoundsException if displayedRowStartIndex out of bound
+     */
+    public void setDisplayedRowStartIndexAndUpdate(int displayedRowStartIndex) {
+        if (!validateDisplayedRowStartIndex(displayedRowStartIndex)) {
+            throw new IndexOutOfBoundsException(String.format("displayedRowStartIndex %d out of menu bound", displayedRowStartIndex));
+        }
+        this.displayedRowStartIndex = displayedRowStartIndex;
+        updateSlots();
+    }
+
+    private static boolean validateDisplayedRowStartIndex(int displayedRowStartIndex) {
+        return displayedRowStartIndex < FiltListContainer.ROW_NUM - FILTPICK_ROW_NUM + 1;
+    }
+
     private void addSlots(Inventory playerInventory, Container filtList) {
         addHotbarSlots(playerInventory);
         addInventorySlots(playerInventory);
         // FiltList must be added at last
-        addFiltList(filtList);
+        addFiltListSlots(filtList);
     }
 
     /**
@@ -74,7 +105,7 @@ public class FiltPickMenu extends AbstractContainerMenu {
         switch (buttonId) {
             case FiltPickScreen.WHITELIST_MODE_BUTTON_ID, FiltPickScreen.DESTRUCTION_MODE_BUTTON_ID ->
                     ((FiltListContainer) serverPlayer).getFiltListPropertyDelegate().switchState(buttonId);
-            case FiltPickScreen.CLEAR_BUTTON_ID -> ((FiltListContainer) serverPlayer).resetFiltListWithProperties();
+            case FiltPickScreen.CLEAR_BUTTON_ID -> ((FiltListContainer) serverPlayer).resetFiltListAndProperties();
         }
         return true;
     }
@@ -97,11 +128,10 @@ public class FiltPickMenu extends AbstractContainerMenu {
         }
     }
 
-    private void addFiltList(Container filtList) {
-        // Add slots for data inventory
+    private void addFiltListSlots(Container filtList) {
         for (int i = 0; i < 3; i++) {
             for (int j = 0; j < 9; j++) {
-                this.addSlot(new Slot(filtList, i * 9 + j, 8 + j * 18, 18 + i * 18));
+                this.addSlot(new Slot(filtList, i * 9 + j + displayedRowStartIndex * 9, 8 + j * 18, 18 + i * 18));
             }
         }
     }
@@ -149,15 +179,15 @@ public class FiltPickMenu extends AbstractContainerMenu {
 
     private void onFiltSlotClicked(int slotIndex, ClickType actionType) {
         int filtSlotIndex = slotIndex - 36;
+        int filtListIndex = filtSlotIndex + displayedRowStartIndex * 9;
         switch (actionType) {
-            case THROW, QUICK_MOVE -> setFiltStackEmpty(filtSlotIndex);
-            case PICKUP, QUICK_CRAFT -> setFiltStackCursorItem(filtSlotIndex);
+            case THROW, QUICK_MOVE -> setFiltStackEmpty(filtListIndex);
+            case PICKUP, QUICK_CRAFT -> setFiltStackCursorItem(filtListIndex);
         }
-        markSlotDirty(slotIndex);
     }
 
-    private void setFiltStackCursorItem(int filtSlotIndex) {
-        filtList.setItem(filtSlotIndex, getCarried().getItem().getDefaultInstance());
+    private void setFiltStackCursorItem(int filtListIndex) {
+        filtList.setItem(filtListIndex, getCarried().getItem().getDefaultInstance());
     }
 
     private void setFiltStackEmpty(int filtSlotIndex) {
@@ -185,6 +215,10 @@ public class FiltPickMenu extends AbstractContainerMenu {
     @Override
     public boolean canTakeItemForPickAll(ItemStack cursorStack, Slot pickedSlot) {
         return pickedSlot.container == playerInventory;
+    }
+
+    public void clearFiltList() {
+        filtList.clearContent();
     }
 
 }
