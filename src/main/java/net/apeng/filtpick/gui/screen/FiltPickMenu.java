@@ -82,8 +82,70 @@ public class FiltPickMenu extends AbstractContainerMenu {
         updateSlots();
     }
 
+    /**
+     * Safe version of {@link #increaseDisplayedRowStartIndexAndUpdate()}. Do nothing if the index is already on bound.
+     * @return {@code ture} if {@code displayedRowStartIndex} is modified.
+     */
+    public boolean safeIncreaseDisplayedRowStartIndexAndUpdate() {
+        if (validateDisplayedRowStartIndex(displayedRowStartIndex + 1)) {
+            increaseDisplayedRowStartIndexAndUpdate();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Safe version of {@link #decreaseDisplayedRowStartIndexAndUpdate()}. Do nothing if the index is already on bound.
+     * @return {@code ture} if {@code displayedRowStartIndex} is modified.
+     */
+    public boolean safeDecreaseDisplayedRowStartIndexAndUpdate() {
+        if (validateDisplayedRowStartIndex(displayedRowStartIndex - 1)) {
+            decreaseDisplayedRowStartIndexAndUpdate();
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Increase displayedRowStartIndex by 1 and update the slot render. Remember to check the bound first or an exception may be thrown.
+     * @see #setDisplayedRowStartIndexAndUpdate(int)
+     * @exception IllegalStateException {@code displayedRowStartIndex} is on the high bound so can not be increased
+     */
+    public void increaseDisplayedRowStartIndexAndUpdate() {
+        try {
+            setDisplayedRowStartIndexAndUpdate(displayedRowStartIndex + 1);
+        } catch (IndexOutOfBoundsException e) {
+            throw new IllegalStateException(
+                    String.format(
+                            "Failed to increase displayedRowStartIndex from %d to %d",
+                            displayedRowStartIndex, displayedRowStartIndex + 1),
+                    e);
+        }
+    }
+
+    /**
+     * Decrease displayedRowStartIndex by 1 and update the slot render. Remember to check the bound first or an exception may be thrown.
+     * @see #setDisplayedRowStartIndexAndUpdate(int)
+     * @exception IllegalStateException {@code displayedRowStartIndex} is on the low bound so can not be decreased
+     */
+    public void decreaseDisplayedRowStartIndexAndUpdate() {
+        try {
+            setDisplayedRowStartIndexAndUpdate(displayedRowStartIndex - 1);
+        } catch (IndexOutOfBoundsException e) {
+            throw new IllegalStateException(
+                    String.format(
+                            "Failed to decrease displayedRowStartIndex from %d to %d",
+                            displayedRowStartIndex, displayedRowStartIndex - 1),
+                    e);
+        }
+    }
+
+    public int getDisplayedRowStartIndex() {
+        return displayedRowStartIndex;
+    }
+
     private static boolean validateDisplayedRowStartIndex(int displayedRowStartIndex) {
-        return displayedRowStartIndex < FiltListContainer.ROW_NUM - FILTPICK_ROW_NUM + 1;
+        return displayedRowStartIndex < FiltListContainer.ROW_NUM - FILTPICK_ROW_NUM + 1 && displayedRowStartIndex >= 0;
     }
 
     private void addSlots(Inventory playerInventory, Container filtList) {

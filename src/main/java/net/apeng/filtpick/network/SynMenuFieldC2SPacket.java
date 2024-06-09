@@ -11,14 +11,25 @@ public class SynMenuFieldC2SPacket {
 
     private final int displayedRowStartIndex;
 
+    /**
+     * @param displayedRowStartIndex Displayed row starting index for client side
+     */
     public SynMenuFieldC2SPacket(int displayedRowStartIndex) {
         this.displayedRowStartIndex = displayedRowStartIndex;
     }
 
+    /**
+     * Decoder. Read displayedRowStartIndex from buf.
+     * @param buf
+     */
     public SynMenuFieldC2SPacket(FriendlyByteBuf buf) {
         this.displayedRowStartIndex = buf.readInt();
     }
 
+    /**
+     * Encode buf by SynMenuFieldC2SPacket
+     * @param buf
+     */
     public void encode(FriendlyByteBuf buf) {
         buf.writeInt(displayedRowStartIndex);
     }

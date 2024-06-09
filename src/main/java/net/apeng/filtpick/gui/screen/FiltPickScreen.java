@@ -1,8 +1,5 @@
 package net.apeng.filtpick.gui.screen;
 
-// TODO synchronize menu slots for both client side and server side,
-//  which means reset slots for both sides.
-
 import net.apeng.filtpick.FiltPick;
 import net.apeng.filtpick.config.FPConfigManager;
 import net.apeng.filtpick.gui.util.LegacyTexturedButtonWidget;
@@ -77,17 +74,37 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
     @Override
     public boolean mouseScrolled(double pMouseX, double pMouseY, double pDelta) {
         if (scrollBar.mouseScrolled(pMouseX, pMouseY, pDelta)) {
-            // TODO
-            if (pDelta > 0) {
-                this.menu.setDisplayedRowStartIndexAndUpdate(0);
-                NetWorkHandler.send2Server(new SynMenuFieldC2SPacket(0));
-            } else {
-                this.menu.setDisplayedRowStartIndexAndUpdate(1);
-                NetWorkHandler.send2Server(new SynMenuFieldC2SPacket(1));
-            }
+            onScrollBarScrolled(pDelta);
             return true;
         }
         return super.mouseScrolled(pMouseX, pMouseY, pDelta);
+    }
+
+    /**
+     * @param pDelta >0 means scrolling up, <0 means scrolling down.
+     */
+    private void onScrollBarScrolled(double pDelta) {
+        if (pDelta > 0) {
+            scrollUpListAndSyn();
+        } else {
+            scrollDownListAndSyn();
+        }
+    }
+
+    private void scrollDownListAndSyn() {
+        if (menu.safeIncreaseDisplayedRowStartIndexAndUpdate()) {
+            synMenuWithServer();
+        }
+    }
+
+    private void scrollUpListAndSyn() {
+        if (menu.safeDecreaseDisplayedRowStartIndexAndUpdate()) {
+            synMenuWithServer();
+        }
+    }
+
+    private void synMenuWithServer() {
+        NetWorkHandler.send2Server(new SynMenuFieldC2SPacket(menu.getDisplayedRowStartIndex()));
     }
 
     @Override

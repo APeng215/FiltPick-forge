@@ -13,17 +13,17 @@ public class ScrollBar extends AbstractWidget {
 
     private final int upBoundY;
     private final int scrollSpaceY; // NOT include bar itself!
-    private double scrollRatio = 0;
 
+    /**
+     *
+     * @param pX x position of the scroll bar in its parent
+     * @param pY y position of the scroll bar in its parent
+     * @param scrollSlotHeight the height of the slot in which the scroll bar scrolls.
+     */
     public ScrollBar(int pX, int pY, int scrollSlotHeight) {
         super(pX, pY, ScrollBarResource.WIDTH, ScrollBarResource.HEIGHT, Component.empty());
         this.upBoundY = pY;
         this.scrollSpaceY = scrollSlotHeight - ScrollBarResource.HEIGHT;
-    }
-
-    private void setScrollRatioAndUpdateRender(double newScrollRatio) {
-        scrollRatio = Mth.clamp(newScrollRatio, 0, 1);
-        this.setY(upBoundY + (int)(scrollRatio * scrollSpaceY));
     }
 
     /**
@@ -51,12 +51,10 @@ public class ScrollBar extends AbstractWidget {
 
     /**
      * Called when the mouse wheel is scrolled within the GUI element.
-     * <p>
-     *
      * @param pMouseX the X coordinate of the mouse.
      * @param pMouseY the Y coordinate of the mouse.
      * @param pDelta  the scrolling delta.
-     * @return {@code true} if the event is consumed, {@code false} otherwise.
+     * @return {@code true} if the scroll bar is active, {@code false} otherwise.
      */
     @Override
     public boolean mouseScrolled(double pMouseX, double pMouseY, double pDelta) {
@@ -92,12 +90,6 @@ public class ScrollBar extends AbstractWidget {
         return super.keyPressed(pKeyCode, pScanCode, pModifiers);
     }
 
-    public void onClick(double pMouseX, double pMouseY) {
-    }
-
-    public void onRelease(double pMouseX, double pMouseY) {
-    }
-
     protected void onDrag(double pMouseX, double pMouseY, double pDragX, double pDragY) {
         setY(Mth.clamp((int)pMouseY - ScrollBarResource.HEIGHT / 2, upBoundY, upBoundY + scrollSpaceY));
     }
@@ -109,4 +101,5 @@ public class ScrollBar extends AbstractWidget {
         private static final int WIDTH = 12;
         private static final int HEIGHT = 15;
     }
+
 }
