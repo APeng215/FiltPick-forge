@@ -31,7 +31,8 @@ import net.minecraft.world.inventory.ContainerData;
 
 public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
 
-    private static final ResourceLocation CONTAINER_BACKGROUND = new ResourceLocation("textures/gui/container/generic_54.png");
+    public static final ResourceLocation CONTAINER_BACKGROUND = new ResourceLocation("textures/gui/container/generic_54.png");
+    public static final ResourceLocation CREATIVE_ITEM_SELECTING_SCREEN = new ResourceLocation("textures/gui/container/creative_inventory/tab_items.png");
     public static final int WHITELIST_MODE_BUTTON_ID = 0;
     public static final int DESTRUCTION_MODE_BUTTON_ID = 1;
     public static final int CLEAR_BUTTON_ID = 2;
@@ -102,25 +103,33 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
     private void scrollDownListAndSyn() {
         if (menu.safeIncreaseDisplayedRowOffsetAndUpdate()) {
             scrollBar.setRowOffset(menu.getDisplayedRowOffset());
-            synMenuWithServer();
         }
     }
 
     private void scrollUpListAndSyn() {
         if (menu.safeDecreaseDisplayedRowOffsetAndUpdate()) {
             scrollBar.setRowOffset(menu.getDisplayedRowOffset());
-            synMenuWithServer();
         }
-    }
-
-    private void synMenuWithServer() {
-        NetWorkHandler.send2Server(new SynMenuFieldC2SPacket(menu.getDisplayedRowOffset()));
     }
 
     @Override
     public boolean mouseDragged(double pMouseX, double pMouseY, int pButton, double pDragX, double pDragY) {
-        if (this.getFocused() != null && this.isDragging() && pButton == 0 && this.getFocused().mouseDragged(pMouseX, pMouseY, pButton, pDragX, pDragY)) {
-            return true;
+        if (this.getFocused() instanceof ContainerScrollBar scrollBar && this.isDragging() && pButton == 0) {
+            return scrollBarDragged(pMouseX, pMouseY, pButton, pDragX, pDragY, scrollBar);
+        } else {
+            return normalDragged(pMouseX, pMouseY, pButton, pDragX, pDragY);
+        }
+    }
+
+    private boolean scrollBarDragged(double pMouseX, double pMouseY, int pButton, double pDragX, double pDragY, ContainerScrollBar scrollBar) {
+        boolean flag = scrollBar.mouseDragged(pMouseX, pMouseY, pButton, pDragX, pDragY);
+        menu.setDisplayedRowOffsetAndUpdate(scrollBar.getDisplayedRowOffset());
+        return flag;
+    }
+
+    private boolean normalDragged(double pMouseX, double pMouseY, int pButton, double pDragX, double pDragY) {
+        if (this.getFocused() != null && this.isDragging() && pButton == 0) {
+            return this.getFocused().mouseDragged(pMouseX, pMouseY, pButton, pDragX, pDragY);
         }
         return super.mouseDragged(pMouseX, pMouseY, pButton, pDragX, pDragY);
     }

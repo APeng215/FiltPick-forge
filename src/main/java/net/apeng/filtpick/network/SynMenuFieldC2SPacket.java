@@ -35,12 +35,14 @@ public class SynMenuFieldC2SPacket {
     }
 
     public void handle(Supplier<NetworkEvent.Context> supplier) {
-        if (supplier.get().getSender().containerMenu instanceof FiltPickMenu filtPickMenu) {
-            filtPickMenu.setDisplayedRowOffsetAndUpdate(displayedRowStartIndex);
-            filtPickMenu.broadcastFullState();
-        } else {
-            FiltPick.LOGGER.warn("FiltPick menu is not opened but receive SynMenuFieldC2SPacket!");
-        }
+        supplier.get().enqueueWork(() -> {
+            if (supplier.get().getSender().containerMenu instanceof FiltPickMenu filtPickMenu) {
+                filtPickMenu.setDisplayedRowOffsetAndUpdate(displayedRowStartIndex);
+                filtPickMenu.broadcastFullState(); // Respond is important
+            } else {
+                FiltPick.LOGGER.warn("FiltPick menu is not opened but receive SynMenuFieldC2SPacket!");
+            }
+        });
         supplier.get().setPacketHandled(true);
     }
 }

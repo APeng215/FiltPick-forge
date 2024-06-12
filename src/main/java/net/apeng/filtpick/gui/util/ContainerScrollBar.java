@@ -133,4 +133,9 @@ public class ContainerScrollBar extends ScrollBar {
         setPosByRatio((double) displayedRowOffset / scrollSpaceInRow);
     }
 
+    @Override
+    protected void onDrag(double pMouseX, double pMouseY, double pDragX, double pDragY) {
+        super.onDrag(pMouseX, pMouseY, pDragX, pDragY);
+        displayedRowOffset = (int) (this.getPosRatio() * scrollSpaceInRow);
+    }
 }

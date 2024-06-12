@@ -37,13 +37,6 @@ public class NetWorkHandler {
                 SynMenuFieldC2SPacket::new,
                 SynMenuFieldC2SPacket::handle
         );
-        INSTANCE.registerMessage(
-                id(),
-                SynMenuFieldS2CRespondPacket.class,
-                SynMenuFieldS2CRespondPacket::encode,
-                SynMenuFieldS2CRespondPacket::new,
-                SynMenuFieldS2CRespondPacket::handle
-        );
     }
 
     public static <MSG> void send2Server(MSG message) {

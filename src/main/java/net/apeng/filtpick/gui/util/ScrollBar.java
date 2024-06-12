@@ -147,11 +147,11 @@ public class ScrollBar extends AbstractWidget {
     }
 
     public static class ScrollBarResource {
-        private static final ResourceLocation LOCATION = new ResourceLocation("textures/gui/container/creative_inventory/tabs.png");
-        private static final int U = 232;
-        private static final int V = 0;
-        private static final int WIDTH = 12;
-        private static final int HEIGHT = 15;
+        public static final ResourceLocation LOCATION = new ResourceLocation("textures/gui/container/creative_inventory/tabs.png");
+        public static final int U = 232;
+        public static final int V = 0;
+        public static final int WIDTH = 12;
+        public static final int HEIGHT = 15;
     }
 
 }

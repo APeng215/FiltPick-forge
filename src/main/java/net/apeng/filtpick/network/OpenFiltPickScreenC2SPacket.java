@@ -18,24 +18,25 @@ public class OpenFiltPickScreenC2SPacket {
     public OpenFiltPickScreenC2SPacket(FriendlyByteBuf buf) {}
     public void encode(FriendlyByteBuf buf) {}
     public void handle(Supplier<NetworkEvent.Context> supplier) {
+        supplier.get().enqueueWork(() -> {
+            supplier.get().getSender().openMenu(new ExtendedMenuProvider() {
 
-        supplier.get().getSender().openMenu(new ExtendedMenuProvider() {
+                @Override
+                public boolean shouldClose() {
+                    return false;
+                }
 
-            @Override
-            public boolean shouldClose() {
-                return false;
-            }
+                @Override
+                public Component getDisplayName() {
+                    return Component.empty();
+                }
 
-            @Override
-            public Component getDisplayName() {
-                return Component.empty();
-            }
+                @Override
+                public AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer) {
+                    return new FiltPickMenu(pContainerId, pPlayerInventory, ((FiltListContainer)pPlayer).getFiltList(), ((FiltListContainer)pPlayer).getFiltListPropertyDelegate());
+                }
 
-            @Override
-            public AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer) {
-                return new FiltPickMenu(pContainerId, pPlayerInventory, ((FiltListContainer)pPlayer).getFiltList(), ((FiltListContainer)pPlayer).getFiltListPropertyDelegate());
-            }
-
+            });
         });
         supplier.get().setPacketHandled(true);
     }

@@ -4,10 +4,7 @@ import net.apeng.filtpick.FiltPick;
 import net.apeng.filtpick.mixinduck.FiltListContainer;
 import net.apeng.filtpick.network.NetWorkHandler;
 import net.apeng.filtpick.network.SynMenuFieldC2SPacket;
-import net.apeng.filtpick.network.SynMenuFieldS2CRespondPacket;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.protocol.game.ServerboundContainerButtonClickPacket;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -92,20 +89,21 @@ public class FiltPickMenu extends AbstractContainerMenu {
         }
         this.displayedRowOffset = displayedRowOffset;
         updateSlots();
-        if (this.playerInventory.player instanceof ServerPlayer serverPlayer) {
-            NetWorkHandler.send2Client(new SynMenuFieldS2CRespondPacket(displayedRowOffset), serverPlayer);
+        if (isClientSide()) {
+            synRowOffsetWithServer();
         }
     }
 
-    private static void synWithServer(int displayedRowOffset) {
-        NetWorkHandler.send2Server(new SynMenuFieldC2SPacket(displayedRowOffset));
+    private boolean isClientSide() {
+        return !(this.playerInventory.player instanceof ServerPlayer);
     }
 
-    /**
-     * @return how much space the list has scrolled by ratio.
-     */
-    public double getScrollOffsetByRatio() {
-        return (double) displayedRowOffset / scrollSpaceInRow;
+    private void synRowOffsetWithServer() {
+        if (isClientSide()) {
+            NetWorkHandler.send2Server(new SynMenuFieldC2SPacket(displayedRowOffset));
+        } else {
+            throw new IllegalStateException("Try to syn row offset with server on server side!");
+        }
     }
 
     /**
@@ -172,6 +170,7 @@ public class FiltPickMenu extends AbstractContainerMenu {
     }
 
     /**
+     * Emulate to {@link ChestMenu#ChestMenu(MenuType, int, Inventory, Container, int)}
      * @param playerInventory
      * @param filtList
      * @see ChestMenu#ChestMenu(MenuType, int, Inventory, Container, int)
