@@ -4,7 +4,11 @@ import net.apeng.filtpick.FiltPick;
 import net.apeng.filtpick.mixinduck.FiltListContainer;
 import net.apeng.filtpick.network.NetWorkHandler;
 import net.apeng.filtpick.network.SynMenuFieldC2SPacket;
+import net.apeng.filtpick.network.SynMenuFieldS2CRespondPacket;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.protocol.game.ServerboundContainerButtonClickPacket;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -88,6 +92,9 @@ public class FiltPickMenu extends AbstractContainerMenu {
         }
         this.displayedRowOffset = displayedRowOffset;
         updateSlots();
+        if (this.playerInventory.player instanceof ServerPlayer serverPlayer) {
+            NetWorkHandler.send2Client(new SynMenuFieldS2CRespondPacket(displayedRowOffset), serverPlayer);
+        }
     }
 
     private static void synWithServer(int displayedRowOffset) {

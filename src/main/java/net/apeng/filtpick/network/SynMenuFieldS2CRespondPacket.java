@@ -2,19 +2,20 @@ package net.apeng.filtpick.network;
 
 import net.apeng.filtpick.FiltPick;
 import net.apeng.filtpick.gui.screen.FiltPickMenu;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public class SynMenuFieldC2SPacket {
+public class SynMenuFieldS2CRespondPacket {
 
     private final int displayedRowStartIndex;
 
     /**
      * @param displayedRowStartIndex Displayed row starting index for client side
      */
-    public SynMenuFieldC2SPacket(int displayedRowStartIndex) {
+    public SynMenuFieldS2CRespondPacket(int displayedRowStartIndex) {
         this.displayedRowStartIndex = displayedRowStartIndex;
     }
 
@@ -22,12 +23,12 @@ public class SynMenuFieldC2SPacket {
      * Decoder. Read displayedRowStartIndex from buf.
      * @param buf
      */
-    public SynMenuFieldC2SPacket(FriendlyByteBuf buf) {
+    public SynMenuFieldS2CRespondPacket(FriendlyByteBuf buf) {
         this.displayedRowStartIndex = buf.readInt();
     }
 
     /**
-     * Encode buf by SynMenuFieldC2SPacket
+     * Encode buf by SynMenuFieldS2CRespondPacket
      * @param buf
      */
     public void encode(FriendlyByteBuf buf) {
@@ -35,11 +36,10 @@ public class SynMenuFieldC2SPacket {
     }
 
     public void handle(Supplier<NetworkEvent.Context> supplier) {
-        if (supplier.get().getSender().containerMenu instanceof FiltPickMenu filtPickMenu) {
+        if (Minecraft.getInstance().player.containerMenu instanceof FiltPickMenu filtPickMenu) {
             filtPickMenu.setDisplayedRowOffsetAndUpdate(displayedRowStartIndex);
-            filtPickMenu.broadcastFullState();
         } else {
-            FiltPick.LOGGER.warn("FiltPick menu is not opened but receive SynMenuFieldC2SPacket!");
+            FiltPick.LOGGER.warn("FiltPick menu is not opened but receive SynMenuFieldS2CRespondPacket!");
         }
         supplier.get().setPacketHandled(true);
     }

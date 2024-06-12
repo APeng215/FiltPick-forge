@@ -37,6 +37,7 @@ public class OpenFiltPickScreenC2SPacket {
             }
 
         });
+        supplier.get().setPacketHandled(true);
     }
 
 }
