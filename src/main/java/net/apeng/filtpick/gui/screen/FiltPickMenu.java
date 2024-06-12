@@ -2,6 +2,8 @@ package net.apeng.filtpick.gui.screen;
 
 import net.apeng.filtpick.FiltPick;
 import net.apeng.filtpick.mixinduck.FiltListContainer;
+import net.apeng.filtpick.network.NetWorkHandler;
+import net.apeng.filtpick.network.SynMenuFieldC2SPacket;
 import net.minecraft.network.protocol.game.ServerboundContainerButtonClickPacket;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -19,11 +21,12 @@ public class FiltPickMenu extends AbstractContainerMenu {
 
     public static final DeferredRegister<MenuType<?>> REGISTER = DeferredRegister.create(ForgeRegistries.MENU_TYPES, FiltPick.ID);
     public static final RegistryObject<MenuType<FiltPickMenu>> TYPE = REGISTER.register("filt_menu", () -> new MenuType(FiltPickMenu::new, FeatureFlags.DEFAULT_FLAGS));
-    private static final int FILTPICK_ROW_NUM = 3;
+    public static final int FILTLIST_DISPLAYED_ROW_NUM = 5;
+    public final int scrollSpaceInRow;
     private final ContainerData propertyDelegate;
     private final Inventory playerInventory;
     private final Container filtList;
-    private int displayedRowStartIndex = 0;
+    private int displayedRowOffset = 0;
 
     // For client side
     public FiltPickMenu(int syncId, Inventory playerInventory) {
@@ -36,6 +39,7 @@ public class FiltPickMenu extends AbstractContainerMenu {
         this.propertyDelegate = propertyDelegate;
         this.playerInventory = playerInventory;
         this.filtList = filtList;
+        this.scrollSpaceInRow = FiltListContainer.ROW_NUM - FILTLIST_DISPLAYED_ROW_NUM;
         checkSize(filtList, propertyDelegate);
         addSlots(playerInventory, filtList);
         addDataSlots(propertyDelegate);
@@ -48,7 +52,7 @@ public class FiltPickMenu extends AbstractContainerMenu {
     }
 
     private static void checkSize(Container filtList, ContainerData propertyDelegate) {
-        checkContainerSize(filtList, FiltListContainer.CAPACITY);
+        checkContainerSize(filtList, FILTLIST_DISPLAYED_ROW_NUM * 9);
         checkContainerDataCount(propertyDelegate, 2);
     }
 
@@ -68,89 +72,107 @@ public class FiltPickMenu extends AbstractContainerMenu {
         addSlots(playerInventory, filtList);
     }
 
+    private static int getActualRowNum() {
+        return FiltListContainer.ROW_NUM;
+    }
+
     /**
      * Set displayed row start index and update the slots render.
      * Should be used for both side to maintain slot consistency.
-     * @param displayedRowStartIndex the row index fot the first row of displayed filtlist
-     * @exception IndexOutOfBoundsException if displayedRowStartIndex out of bound
+     * @param displayedRowOffset the row index fot the first row of displayed filtlist
+     * @exception IndexOutOfBoundsException if displayedRowOffset out of bound
      */
-    public void setDisplayedRowStartIndexAndUpdate(int displayedRowStartIndex) {
-        if (!validateDisplayedRowStartIndex(displayedRowStartIndex)) {
-            throw new IndexOutOfBoundsException(String.format("displayedRowStartIndex %d out of menu bound", displayedRowStartIndex));
+    public void setDisplayedRowOffsetAndUpdate(int displayedRowOffset) {
+        if (!validateDisplayedRowOffset(displayedRowOffset)) {
+            throw new IndexOutOfBoundsException(String.format("displayedRowOffset %d out of menu bound", displayedRowOffset));
         }
-        this.displayedRowStartIndex = displayedRowStartIndex;
+        this.displayedRowOffset = displayedRowOffset;
         updateSlots();
     }
 
+    private static void synWithServer(int displayedRowOffset) {
+        NetWorkHandler.send2Server(new SynMenuFieldC2SPacket(displayedRowOffset));
+    }
+
     /**
-     * Safe version of {@link #increaseDisplayedRowStartIndexAndUpdate()}. Do nothing if the index is already on bound.
-     * @return {@code ture} if {@code displayedRowStartIndex} is modified.
+     * @return how much space the list has scrolled by ratio.
      */
-    public boolean safeIncreaseDisplayedRowStartIndexAndUpdate() {
-        if (validateDisplayedRowStartIndex(displayedRowStartIndex + 1)) {
-            increaseDisplayedRowStartIndexAndUpdate();
+    public double getScrollOffsetByRatio() {
+        return (double) displayedRowOffset / scrollSpaceInRow;
+    }
+
+    /**
+     * Safe version of {@link #increaseDisplayedRowOffsetAndUpdate()}. Do nothing if the index is already on bound.
+     * @return {@code ture} if {@code displayedRowOffset} is modified.
+     */
+    public boolean safeIncreaseDisplayedRowOffsetAndUpdate() {
+        if (validateDisplayedRowOffset(displayedRowOffset + 1)) {
+            increaseDisplayedRowOffsetAndUpdate();
             return true;
         }
         return false;
     }
 
     /**
-     * Safe version of {@link #decreaseDisplayedRowStartIndexAndUpdate()}. Do nothing if the index is already on bound.
-     * @return {@code ture} if {@code displayedRowStartIndex} is modified.
+     * Safe version of {@link #decreaseDisplayedRowOffsetAndUpdate()}. Do nothing if the index is already on bound.
+     * @return {@code ture} if {@code displayedRowOffset} is modified.
      */
-    public boolean safeDecreaseDisplayedRowStartIndexAndUpdate() {
-        if (validateDisplayedRowStartIndex(displayedRowStartIndex - 1)) {
-            decreaseDisplayedRowStartIndexAndUpdate();
+    public boolean safeDecreaseDisplayedRowOffsetAndUpdate() {
+        if (validateDisplayedRowOffset(displayedRowOffset - 1)) {
+            decreaseDisplayedRowOffsetAndUpdate();
             return true;
         }
         return false;
     }
 
     /**
-     * Increase displayedRowStartIndex by 1 and update the slot render. Remember to check the bound first or an exception may be thrown.
-     * @see #setDisplayedRowStartIndexAndUpdate(int)
-     * @exception IllegalStateException {@code displayedRowStartIndex} is on the high bound so can not be increased
+     * Increase displayedRowOffset by 1 and update the slot render. Remember to check the bound first or an exception may be thrown.
+     * @see #setDisplayedRowOffsetAndUpdate(int)
+     * @exception IllegalStateException {@code displayedRowOffset} is on the high bound so can not be increased
      */
-    public void increaseDisplayedRowStartIndexAndUpdate() {
+    public void increaseDisplayedRowOffsetAndUpdate() {
         try {
-            setDisplayedRowStartIndexAndUpdate(displayedRowStartIndex + 1);
+            setDisplayedRowOffsetAndUpdate(displayedRowOffset + 1);
         } catch (IndexOutOfBoundsException e) {
             throw new IllegalStateException(
-                    String.format(
-                            "Failed to increase displayedRowStartIndex from %d to %d",
-                            displayedRowStartIndex, displayedRowStartIndex + 1),
-                    e);
+                    String.format("Failed to increase displayedRowOffset from %d to %d", displayedRowOffset, displayedRowOffset + 1), e);
         }
     }
 
     /**
-     * Decrease displayedRowStartIndex by 1 and update the slot render. Remember to check the bound first or an exception may be thrown.
-     * @see #setDisplayedRowStartIndexAndUpdate(int)
-     * @exception IllegalStateException {@code displayedRowStartIndex} is on the low bound so can not be decreased
+     * Decrease displayedRowOffset by 1 and update the slot render. Remember to check the bound first or an exception may be thrown.
+     * @see #setDisplayedRowOffsetAndUpdate(int)
+     * @exception IllegalStateException {@code displayedRowOffset} is on the low bound so can not be decreased
      */
-    public void decreaseDisplayedRowStartIndexAndUpdate() {
+    public void decreaseDisplayedRowOffsetAndUpdate() {
         try {
-            setDisplayedRowStartIndexAndUpdate(displayedRowStartIndex - 1);
+            setDisplayedRowOffsetAndUpdate(displayedRowOffset - 1);
         } catch (IndexOutOfBoundsException e) {
             throw new IllegalStateException(
                     String.format(
-                            "Failed to decrease displayedRowStartIndex from %d to %d",
-                            displayedRowStartIndex, displayedRowStartIndex - 1),
+                            "Failed to decrease displayedRowOffset from %d to %d",
+                            displayedRowOffset, displayedRowOffset - 1),
                     e);
         }
     }
 
-    public int getDisplayedRowStartIndex() {
-        return displayedRowStartIndex;
+    private boolean validateDisplayedRowOffset(int displayedRowOffset) {
+        return displayedRowOffset <= scrollSpaceInRow && displayedRowOffset >= 0;
     }
 
-    private static boolean validateDisplayedRowStartIndex(int displayedRowStartIndex) {
-        return displayedRowStartIndex < FiltListContainer.ROW_NUM - FILTPICK_ROW_NUM + 1 && displayedRowStartIndex >= 0;
+    public int getDisplayedRowOffset() {
+        return displayedRowOffset;
     }
 
+    /**
+     * @param playerInventory
+     * @param filtList
+     * @see ChestMenu#ChestMenu(MenuType, int, Inventory, Container, int)
+     */
     private void addSlots(Inventory playerInventory, Container filtList) {
-        addHotbarSlots(playerInventory);
-        addInventorySlots(playerInventory);
+        int i = (FILTLIST_DISPLAYED_ROW_NUM - 4) * 18;
+        addHotbarSlots(playerInventory, i);
+        addInventorySlots(playerInventory, i);
         // FiltList must be added at last
         addFiltListSlots(filtList);
     }
@@ -176,24 +198,24 @@ public class FiltPickMenu extends AbstractContainerMenu {
         return propertyDelegate;
     }
 
-    private void addHotbarSlots(Inventory playerInventory) {
-        for (int i = 0; i < 9; ++i) {
-            this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 142));
+    private void addHotbarSlots(Inventory playerInventory, int i) {
+        for(int i1 = 0; i1 < 9; ++i1) {
+            this.addSlot(new Slot(playerInventory, i1, 8 + i1 * 18, 161 + i));
         }
     }
 
-    private void addInventorySlots(Inventory playerInventory) {
-        for (int i = 0; i < 3; ++i) {
-            for (int j = 0; j < 9; ++j) {
-                this.addSlot(new Slot(playerInventory, j + (i + 1) * 9, 8 + j * 18, 84 + i * 18));
+    private void addInventorySlots(Inventory playerInventory, int i) {
+        for(int l = 0; l < 3; ++l) {
+            for(int j1 = 0; j1 < 9; ++j1) {
+                this.addSlot(new Slot(playerInventory, j1 + l * 9 + 9, 8 + j1 * 18, 103 + l * 18 + i));
             }
         }
     }
 
     private void addFiltListSlots(Container filtList) {
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 9; j++) {
-                this.addSlot(new Slot(filtList, i * 9 + j + displayedRowStartIndex * 9, 8 + j * 18, 18 + i * 18));
+        for(int j = 0; j < FILTLIST_DISPLAYED_ROW_NUM; ++j) {
+            for(int k = 0; k < 9; ++k) {
+                this.addSlot(new Slot(filtList, k + j * 9 + displayedRowOffset * 9, 8 + k * 18, 18 + j * 18));
             }
         }
     }
@@ -227,7 +249,7 @@ public class FiltPickMenu extends AbstractContainerMenu {
      *
      * @param slotIndex
      * @param button
-     * @param actionType the type of slot click, check the docs for each {@link SlotActionType} value for details
+     * @param actionType the type of slot click, check the docs for each SlotActionType value for details
      * @param player
      */
     @Override
@@ -241,7 +263,7 @@ public class FiltPickMenu extends AbstractContainerMenu {
 
     private void onFiltSlotClicked(int slotIndex, ClickType actionType) {
         int filtSlotIndex = slotIndex - 36;
-        int filtListIndex = filtSlotIndex + displayedRowStartIndex * 9;
+        int filtListIndex = filtSlotIndex + displayedRowOffset * 9;
         switch (actionType) {
             case THROW, QUICK_MOVE -> setFiltStackEmpty(filtListIndex);
             case PICKUP, QUICK_CRAFT -> setFiltStackCursorItem(filtListIndex);
@@ -279,6 +301,9 @@ public class FiltPickMenu extends AbstractContainerMenu {
         return pickedSlot.container == playerInventory;
     }
 
+    /**
+     * Clear filt list content excluding filt list properties.
+     */
     public void clearFiltList() {
         filtList.clearContent();
     }

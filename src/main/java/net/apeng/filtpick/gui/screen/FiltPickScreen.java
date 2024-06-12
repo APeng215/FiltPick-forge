@@ -2,8 +2,10 @@ package net.apeng.filtpick.gui.screen;
 
 import net.apeng.filtpick.FiltPick;
 import net.apeng.filtpick.config.FPConfigManager;
+import net.apeng.filtpick.gui.util.ContainerScrollBar;
 import net.apeng.filtpick.gui.util.LegacyTexturedButtonWidget;
 import net.apeng.filtpick.gui.util.ScrollBar;
+import net.apeng.filtpick.mixinduck.FiltListContainer;
 import net.apeng.filtpick.network.NetWorkHandler;
 import net.apeng.filtpick.network.SynMenuFieldC2SPacket;
 import net.apeng.filtpick.util.IntBoolConvertor;
@@ -29,22 +31,26 @@ import net.minecraft.world.inventory.ContainerData;
 
 public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
 
+    private static final ResourceLocation CONTAINER_BACKGROUND = new ResourceLocation("textures/gui/container/generic_54.png");
     public static final int WHITELIST_MODE_BUTTON_ID = 0;
     public static final int DESTRUCTION_MODE_BUTTON_ID = 1;
     public static final int CLEAR_BUTTON_ID = 2;
     private static final Style EXPLANATION_STYLE = Style.EMPTY.withColor(ChatFormatting.DARK_GRAY).applyFormats(ChatFormatting.ITALIC);
-    private static final ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation("textures/gui/container/shulker_box.png");
     private static final ResourceLocation FILT_MODE_BUTTON_TEXTURE = ResourceLocation.tryBuild(FiltPick.ID, "gui/filtmode_button.png");
     private static final ResourceLocation DESTRUCTION_BUTTON_TEXTURE = ResourceLocation.tryBuild(FiltPick.ID, "gui/destruction_button.png");
     private static final ResourceLocation CLEAR_BUTTON_TEXTURE = ResourceLocation.tryBuild(FiltPick.ID, "gui/clearlist_button.png");
     private static final ResourceLocation RETURN_BUTTON_TEXTURE = ResourceLocation.tryBuild(FiltPick.ID, "gui/return_button.png");
 
+    private final int containerRows;
     private FPToggleButton filtModeButton, destructionButton;
     private LegacyTexturedButtonWidget clearButton, returnButton;
-    private ScrollBar scrollBar;
+    private ContainerScrollBar scrollBar;
 
     public FiltPickScreen(FiltPickMenu handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
+        this.containerRows = FiltPickMenu.FILTLIST_DISPLAYED_ROW_NUM;
+        this.imageHeight = 114 + this.containerRows * 18;
+        this.inventoryLabelY = this.imageHeight - 94;
     }
 
     @Override
@@ -56,10 +62,12 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
     }
 
     private void addScrollBar() {
-        scrollBar = new ScrollBar(
+        scrollBar = new ContainerScrollBar(
                 this.leftPos + 170,
                 this.topPos + 4,
-                80
+                80,
+                FiltPickMenu.FILTLIST_DISPLAYED_ROW_NUM,
+                FiltListContainer.ROW_NUM
         );
         this.addRenderableWidget(scrollBar);
     }
@@ -83,7 +91,7 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
     /**
      * @param pDelta >0 means scrolling up, <0 means scrolling down.
      */
-    private void onScrollBarScrolled(double pDelta) {
+    protected void onScrollBarScrolled(double pDelta) {
         if (pDelta > 0) {
             scrollUpListAndSyn();
         } else {
@@ -92,19 +100,21 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
     }
 
     private void scrollDownListAndSyn() {
-        if (menu.safeIncreaseDisplayedRowStartIndexAndUpdate()) {
+        if (menu.safeIncreaseDisplayedRowOffsetAndUpdate()) {
+            scrollBar.setRowOffset(menu.getDisplayedRowOffset());
             synMenuWithServer();
         }
     }
 
     private void scrollUpListAndSyn() {
-        if (menu.safeDecreaseDisplayedRowStartIndexAndUpdate()) {
+        if (menu.safeDecreaseDisplayedRowOffsetAndUpdate()) {
+            scrollBar.setRowOffset(menu.getDisplayedRowOffset());
             synMenuWithServer();
         }
     }
 
     private void synMenuWithServer() {
-        NetWorkHandler.send2Server(new SynMenuFieldC2SPacket(menu.getDisplayedRowStartIndex()));
+        NetWorkHandler.send2Server(new SynMenuFieldC2SPacket(menu.getDisplayedRowOffset()));
     }
 
     @Override
@@ -191,7 +201,7 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         this.renderBackground(context);
         super.render(context, mouseX, mouseY, delta);
-        this.renderTitle(context, font, Component.translatable("filtpick_screen_name"), 72, topPos + 4, width - 72, topPos + 14, 0x404040);
+        this.renderTitle(context, font, Component.translatable("filtpick_screen_name"), 72, topPos + 5, width - 72, topPos + 15, 0x404040);
         this.renderTooltip(context, mouseX, mouseY);
     }
 
@@ -220,7 +230,8 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
     protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
         int i = (this.width - this.imageWidth) / 2;
         int j = (this.height - this.imageHeight) / 2;
-        context.blit(BACKGROUND_TEXTURE, i, j, 0, 0, this.imageWidth, this.imageHeight);
+        context.blit(CONTAINER_BACKGROUND, i, j, 0, 0, this.imageWidth, this.containerRows * 18 + 17);
+        context.blit(CONTAINER_BACKGROUND, i, j + this.containerRows * 18 + 17, 0, 126, this.imageWidth, 96);
     }
 
     private void sendButtonClickC2SPacket(int buttonId) {

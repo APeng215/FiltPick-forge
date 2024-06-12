@@ -12,10 +12,11 @@ import java.awt.event.KeyEvent;
 public class ScrollBar extends AbstractWidget {
 
     private final int upBoundY;
-    private final int scrollSpaceY; // NOT include bar itself!
+    private final int scrollSlotHeight; // Include scroll block itself
+    private final int scrollSpaceY; // NOT include scroll block itself
 
     /**
-     *
+     * ScrollBar constructed by this method is active by default.
      * @param pX x position of the scroll bar in its parent
      * @param pY y position of the scroll bar in its parent
      * @param scrollSlotHeight the height of the slot in which the scroll bar scrolls.
@@ -23,7 +24,23 @@ public class ScrollBar extends AbstractWidget {
     public ScrollBar(int pX, int pY, int scrollSlotHeight) {
         super(pX, pY, ScrollBarResource.WIDTH, ScrollBarResource.HEIGHT, Component.empty());
         this.upBoundY = pY;
+        this.scrollSlotHeight = scrollSlotHeight;
         this.scrollSpaceY = scrollSlotHeight - ScrollBarResource.HEIGHT;
+    }
+
+    /**
+     *
+     * @param pX x position of the scroll bar in its parent
+     * @param pY y position of the scroll bar in its parent
+     * @param scrollSlotHeight the height of the slot in which the scroll bar scrolls.
+     * @param active if scroll block is active
+     */
+    public ScrollBar(int pX, int pY, int scrollSlotHeight, boolean active) {
+        super(pX, pY, ScrollBarResource.WIDTH, ScrollBarResource.HEIGHT, Component.empty());
+        this.upBoundY = pY;
+        this.scrollSlotHeight = scrollSlotHeight;
+        this.scrollSpaceY = scrollSlotHeight - ScrollBarResource.HEIGHT;
+        this.active = active;
     }
 
     /**
@@ -67,8 +84,6 @@ public class ScrollBar extends AbstractWidget {
 
     /**
      * Called when a keyboard key is pressed within the GUI element.
-     * <p>
-     *
      * @param pKeyCode   the key code of the pressed key.
      * @param pScanCode  the scan code of the pressed key.
      * @param pModifiers the keyboard modifiers.
@@ -92,6 +107,43 @@ public class ScrollBar extends AbstractWidget {
 
     protected void onDrag(double pMouseX, double pMouseY, double pDragX, double pDragY) {
         setY(Mth.clamp((int)pMouseY - ScrollBarResource.HEIGHT / 2, upBoundY, upBoundY + scrollSpaceY));
+    }
+
+    /**
+     * @return the height including scroll block itself
+     * @see #getScrollSpaceY()
+     */
+    public int getScrollSlotHeight() {
+        return scrollSlotHeight;
+    }
+
+    /**
+     * @return the space NOT including scroll block itself
+     * @see #getScrollSlotHeight()
+     */
+    public int getScrollSpaceY() {
+        return scrollSpaceY;
+    }
+
+    /**
+     * Returns how far the scroll block has slided from the start by ratio.
+     * Will return 0 if the scroll block is at the start
+     * or return 1 if the scroll is at the end.
+     * @return
+     */
+    public double getPosRatio() {
+        int offsetY = getY() - upBoundY;
+        return offsetY / (double) scrollSpaceY;
+    }
+
+    /**
+     * Set scroll block position by ratio. If the ratio is or below 0, scroll block will be set to the start. Same to at and above 1.
+     * @param ratio
+     */
+    public void setPosByRatio(double ratio) {
+        double safeRatio = Mth.clamp(ratio, 0, 1);
+        int offsetY = (int) (scrollSpaceY * safeRatio);
+        setY(upBoundY + offsetY);
     }
 
     public static class ScrollBarResource {
