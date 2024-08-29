@@ -6,6 +6,7 @@ import net.apeng.filtpick.gui.screen.FiltPickScreen;
 import net.apeng.filtpick.mixinduck.FiltListContainer;
 import net.apeng.filtpick.gui.util.ExtendedMenuProvider;
 import net.apeng.filtpick.property.FiltListPropertyDelegate;
+import net.apeng.filtpick.util.SlotsContainer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
@@ -27,7 +28,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class ServerPlayerEntityMixin extends Player implements FiltListContainer {
 
     @Unique
-    private SimpleContainer filtList = new SimpleContainer(27);
+    private SimpleContainer filtList = new SlotsContainer(FiltListContainer.CAPACITY);
 
     @Unique
     private FiltListPropertyDelegate filtListPropertyDelegate = new FiltListPropertyDelegate();
@@ -83,6 +84,11 @@ public abstract class ServerPlayerEntityMixin extends Player implements FiltList
         filtListPropertyDelegate.set(FiltPickScreen.DESTRUCTION_MODE_BUTTON_ID, nbt.getInt("isDestructionModeOn"));
     }
 
+
+    /**
+     * {"FiltList": [itemCompound#1, itemCompound#2...], ...}
+     * @param nbt
+     */
     @Unique
     private void writeFiltList(CompoundTag nbt) {
         nbt.put("FiltList", this.filtList.createTag());
@@ -115,7 +121,7 @@ public abstract class ServerPlayerEntityMixin extends Player implements FiltList
     }
 
     @Override
-    public void resetFiltListWithProperties() {
+    public void resetFiltListAndProperties() {
         getFiltList().clearContent();
         getFiltListPropertyDelegate().reset();
     }

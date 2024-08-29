@@ -1,9 +1,10 @@
 package net.apeng.filtpick.gui.screen;
 
-
 import net.apeng.filtpick.FiltPick;
 import net.apeng.filtpick.config.FPConfigManager;
+import net.apeng.filtpick.gui.util.ContainerScrollBar;
 import net.apeng.filtpick.gui.util.LegacyTexturedButtonWidget;
+import net.apeng.filtpick.mixinduck.FiltListContainer;
 import net.apeng.filtpick.util.IntBoolConvertor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
@@ -27,21 +28,25 @@ import net.minecraft.world.inventory.ContainerData;
 
 public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
 
+    public static final ResourceLocation CONTAINER_BACKGROUND = new ResourceLocation("textures/gui/container/generic_54.png");
+    public static final ResourceLocation CREATIVE_ITEM_SELECTING_SCREEN = new ResourceLocation("textures/gui/container/creative_inventory/tab_items.png");
     public static final int WHITELIST_MODE_BUTTON_ID = 0;
     public static final int DESTRUCTION_MODE_BUTTON_ID = 1;
     public static final int CLEAR_BUTTON_ID = 2;
     private static final Style EXPLANATION_STYLE = Style.EMPTY.withColor(ChatFormatting.DARK_GRAY).applyFormats(ChatFormatting.ITALIC);
-    private static final ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation("textures/gui/container/shulker_box.png");
     private static final ResourceLocation FILT_MODE_BUTTON_TEXTURE = ResourceLocation.tryBuild(FiltPick.ID, "gui/filtmode_button.png");
     private static final ResourceLocation DESTRUCTION_BUTTON_TEXTURE = ResourceLocation.tryBuild(FiltPick.ID, "gui/destruction_button.png");
     private static final ResourceLocation CLEAR_BUTTON_TEXTURE = ResourceLocation.tryBuild(FiltPick.ID, "gui/clearlist_button.png");
     private static final ResourceLocation RETURN_BUTTON_TEXTURE = ResourceLocation.tryBuild(FiltPick.ID, "gui/return_button.png");
-
+    private static final int CONTAINER_ROWS = FiltPickMenu.FILTLIST_DISPLAYED_ROW_NUM;
     private FPToggleButton filtModeButton, destructionButton;
     private LegacyTexturedButtonWidget clearButton, returnButton;
+    private ContainerScrollBar scrollBar;
 
     public FiltPickScreen(FiltPickMenu handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
+        this.imageHeight = 114 + CONTAINER_ROWS * 18;
+        this.inventoryLabelY = this.imageHeight - 94;
     }
 
     @Override
@@ -49,6 +54,22 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
         super.init();
         setTitlePosition();
         addButtons();
+        addScrollBar();
+    }
+
+    private void addScrollBar() {
+        int leftEdge = (this.width - this.imageWidth) / 2;
+        int topEdge = (this.height - this.imageHeight) / 2;
+        int rightEdge = this.width - leftEdge;
+        int bottomEdge = this.height - topEdge;
+        scrollBar = new ContainerScrollBar(
+                rightEdge + 2,
+                topEdge + 4,
+                110,
+                FiltPickMenu.FILTLIST_DISPLAYED_ROW_NUM,
+                FiltListContainer.ROW_NUM
+        );
+        this.addRenderableWidget(scrollBar);
     }
 
     private void addButtons() {
@@ -56,6 +77,60 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
         addDestructionButton();
         addClearButton();
         addReturnButton();
+    }
+
+    @Override
+    public boolean mouseScrolled(double pMouseX, double pMouseY, double pDelta) {
+        if (scrollBar.mouseScrolled(pMouseX, pMouseY, pDelta)) {
+            onScrollBarScrolled(pDelta);
+            return true;
+        }
+        return super.mouseScrolled(pMouseX, pMouseY, pDelta);
+    }
+
+    /**
+     * @param pDelta >0 means scrolling up, <0 means scrolling down.
+     */
+    protected void onScrollBarScrolled(double pDelta) {
+        if (pDelta > 0) {
+            scrollUpListAndSyn();
+        } else {
+            scrollDownListAndSyn();
+        }
+    }
+
+    private void scrollDownListAndSyn() {
+        if (menu.safeIncreaseDisplayedRowOffsetAndUpdate()) {
+            scrollBar.setRowOffset(menu.getDisplayedRowOffset());
+        }
+    }
+
+    private void scrollUpListAndSyn() {
+        if (menu.safeDecreaseDisplayedRowOffsetAndUpdate()) {
+            scrollBar.setRowOffset(menu.getDisplayedRowOffset());
+        }
+    }
+
+    @Override
+    public boolean mouseDragged(double pMouseX, double pMouseY, int pButton, double pDragX, double pDragY) {
+        if (this.getFocused() instanceof ContainerScrollBar scrollBar && this.isDragging() && pButton == 0) {
+            return scrollBarDragged(pMouseX, pMouseY, pButton, pDragX, pDragY, scrollBar);
+        } else {
+            return normalDragged(pMouseX, pMouseY, pButton, pDragX, pDragY);
+        }
+    }
+
+    private boolean scrollBarDragged(double pMouseX, double pMouseY, int pButton, double pDragX, double pDragY, ContainerScrollBar scrollBar) {
+        boolean flag = scrollBar.mouseDragged(pMouseX, pMouseY, pButton, pDragX, pDragY);
+        menu.setDisplayedRowOffsetAndUpdate(scrollBar.getDisplayedRowOffset());
+        return flag;
+    }
+
+    private boolean normalDragged(double pMouseX, double pMouseY, int pButton, double pDragX, double pDragY) {
+        if (this.getFocused() != null && this.isDragging() && pButton == 0) {
+            return this.getFocused().mouseDragged(pMouseX, pMouseY, pButton, pDragX, pDragY);
+        }
+        return super.mouseDragged(pMouseX, pMouseY, pButton, pDragX, pDragY);
     }
 
     private void addFiltModeButton() {
@@ -94,7 +169,10 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
                 0,
                 12,
                 CLEAR_BUTTON_TEXTURE,
-                button -> sendButtonClickC2SPacket(CLEAR_BUTTON_ID)
+                button -> {
+                    sendButtonClickC2SPacket(CLEAR_BUTTON_ID);
+                    menu.clearFiltList();
+                }
         );
         setTooltip2ClearButton();
         addRenderableWidget(clearButton);
@@ -131,7 +209,7 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         this.renderBackground(context);
         super.render(context, mouseX, mouseY, delta);
-        this.renderTitle(context, font, Component.translatable("filtpick_screen_name"), 72, topPos + 4, width - 72, topPos + 14, 0x404040);
+        this.renderTitle(context, font, Component.translatable("filtpick_screen_name"), 72, topPos + 5, width - 72, topPos + 15, 0x404040);
         this.renderTooltip(context, mouseX, mouseY);
     }
 
@@ -158,9 +236,21 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
 
     @Override
     protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
-        int i = (this.width - this.imageWidth) / 2;
-        int j = (this.height - this.imageHeight) / 2;
-        context.blit(BACKGROUND_TEXTURE, i, j, 0, 0, this.imageWidth, this.imageHeight);
+        int leftEdge = (this.width - this.imageWidth) / 2;
+        int topEdge = (this.height - this.imageHeight) / 2;
+        int rightEdge = this.width - leftEdge;
+        int bottomEdge = this.height - topEdge;
+        renderContainer(context, leftEdge, topEdge);
+        renderScrollSlot(context, rightEdge, topEdge);
+    }
+
+    private void renderScrollSlot(GuiGraphics context, int rightEdge, int topEdge) {
+        context.blit(CREATIVE_ITEM_SELECTING_SCREEN, rightEdge + 1, topEdge + 3, 174, 17, 14, 112);
+    }
+
+    private void renderContainer(GuiGraphics context, int i, int j) {
+        context.blit(CONTAINER_BACKGROUND, i, j, 0, 0, this.imageWidth, CONTAINER_ROWS * 18 + 17);
+        context.blit(CONTAINER_BACKGROUND, i, j + CONTAINER_ROWS * 18 + 17, 0, 126, this.imageWidth, 96);
     }
 
     private void sendButtonClickC2SPacket(int buttonId) {

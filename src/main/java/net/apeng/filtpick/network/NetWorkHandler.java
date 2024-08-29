@@ -8,6 +8,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public class NetWorkHandler {
+
     private static final String PROTOCOL_VERSION = "1";
     private static final SimpleChannel INSTANCE = NetworkRegistry.newSimpleChannel(
             new ResourceLocation(FiltPick.ID, "main"),
@@ -29,6 +30,13 @@ public class NetWorkHandler {
                 OpenFiltPickScreenC2SPacket::new,
                 OpenFiltPickScreenC2SPacket::handle
         );
+        INSTANCE.registerMessage(
+                id(),
+                SynMenuFieldC2SPacket.class,
+                SynMenuFieldC2SPacket::encode,
+                SynMenuFieldC2SPacket::new,
+                SynMenuFieldC2SPacket::handle
+        );
     }
 
     public static <MSG> void send2Server(MSG message) {
@@ -38,4 +46,5 @@ public class NetWorkHandler {
     public static <MSG> void send2Client(MSG message, ServerPlayer player) {
         INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), message);
     }
+
 }
