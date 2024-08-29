@@ -27,6 +27,24 @@ public class ContainerScrollBar extends ScrollBar {
     }
 
     /**
+     * ScrollBar constructed by this method is active by default.
+     *
+     * @param pX               x position of the scroll bar in its parent
+     * @param pY               y position of the scroll bar in its parent
+     * @param scrollSlotHeight the height of the slot in which the scroll bar scrolls in pixel.
+     * @param displayedRowNum
+     * @param actualRowNum
+     * @param displayedRowOffset
+     */
+    public ContainerScrollBar(int pX, int pY, int scrollSlotHeight, int displayedRowNum, int actualRowNum, int displayedRowOffset) {
+        super(pX, pY, scrollSlotHeight);
+        this.displayedRowNum = displayedRowNum;
+        this.actualRowNum = actualRowNum;
+        this.scrollSpaceInRow = actualRowNum - displayedRowNum;
+        this.displayedRowOffset = displayedRowOffset;
+    }
+
+    /**
      * @param pX               x position of the scroll bar in its parent
      * @param pY               y position of the scroll bar in its parent
      * @param scrollSlotHeight the height of the slot in which the scroll bar scrolls in pixel.
