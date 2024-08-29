@@ -4,10 +4,7 @@ import net.apeng.filtpick.FiltPick;
 import net.apeng.filtpick.config.FPConfigManager;
 import net.apeng.filtpick.gui.util.ContainerScrollBar;
 import net.apeng.filtpick.gui.util.LegacyTexturedButtonWidget;
-import net.apeng.filtpick.gui.util.ScrollBar;
 import net.apeng.filtpick.mixinduck.FiltListContainer;
-import net.apeng.filtpick.network.NetWorkHandler;
-import net.apeng.filtpick.network.SynMenuFieldC2SPacket;
 import net.apeng.filtpick.util.IntBoolConvertor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
@@ -41,16 +38,14 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
     private static final ResourceLocation DESTRUCTION_BUTTON_TEXTURE = ResourceLocation.tryBuild(FiltPick.ID, "gui/destruction_button.png");
     private static final ResourceLocation CLEAR_BUTTON_TEXTURE = ResourceLocation.tryBuild(FiltPick.ID, "gui/clearlist_button.png");
     private static final ResourceLocation RETURN_BUTTON_TEXTURE = ResourceLocation.tryBuild(FiltPick.ID, "gui/return_button.png");
-
-    private final int containerRows;
+    private static final int CONTAINER_ROWS = FiltPickMenu.FILTLIST_DISPLAYED_ROW_NUM;
     private FPToggleButton filtModeButton, destructionButton;
     private LegacyTexturedButtonWidget clearButton, returnButton;
     private ContainerScrollBar scrollBar;
 
     public FiltPickScreen(FiltPickMenu handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
-        this.containerRows = FiltPickMenu.FILTLIST_DISPLAYED_ROW_NUM;
-        this.imageHeight = 114 + this.containerRows * 18;
+        this.imageHeight = 114 + CONTAINER_ROWS * 18;
         this.inventoryLabelY = this.imageHeight - 94;
     }
 
@@ -63,10 +58,14 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
     }
 
     private void addScrollBar() {
+        int leftEdge = (this.width - this.imageWidth) / 2;
+        int topEdge = (this.height - this.imageHeight) / 2;
+        int rightEdge = this.width - leftEdge;
+        int bottomEdge = this.height - topEdge;
         scrollBar = new ContainerScrollBar(
-                this.leftPos + 170,
-                this.topPos + 4,
-                80,
+                rightEdge + 2,
+                topEdge + 4,
+                110,
                 FiltPickMenu.FILTLIST_DISPLAYED_ROW_NUM,
                 FiltListContainer.ROW_NUM
         );
@@ -237,10 +236,21 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
 
     @Override
     protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
-        int i = (this.width - this.imageWidth) / 2;
-        int j = (this.height - this.imageHeight) / 2;
-        context.blit(CONTAINER_BACKGROUND, i, j, 0, 0, this.imageWidth, this.containerRows * 18 + 17);
-        context.blit(CONTAINER_BACKGROUND, i, j + this.containerRows * 18 + 17, 0, 126, this.imageWidth, 96);
+        int leftEdge = (this.width - this.imageWidth) / 2;
+        int topEdge = (this.height - this.imageHeight) / 2;
+        int rightEdge = this.width - leftEdge;
+        int bottomEdge = this.height - topEdge;
+        renderContainer(context, leftEdge, topEdge);
+        renderScrollSlot(context, rightEdge, topEdge);
+    }
+
+    private void renderScrollSlot(GuiGraphics context, int rightEdge, int topEdge) {
+        context.blit(CREATIVE_ITEM_SELECTING_SCREEN, rightEdge + 1, topEdge + 3, 174, 17, 14, 112);
+    }
+
+    private void renderContainer(GuiGraphics context, int i, int j) {
+        context.blit(CONTAINER_BACKGROUND, i, j, 0, 0, this.imageWidth, CONTAINER_ROWS * 18 + 17);
+        context.blit(CONTAINER_BACKGROUND, i, j + CONTAINER_ROWS * 18 + 17, 0, 126, this.imageWidth, 96);
     }
 
     private void sendButtonClickC2SPacket(int buttonId) {
