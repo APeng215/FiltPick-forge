@@ -1,5 +1,4 @@
 {
-  "refmap": "mixins.filtpick.refmap.json",
   "required": true,
   "minVersion": "0.8",
   "package": "net.apeng.filtpick.mixin",
