@@ -24,6 +24,7 @@ public class FiltPick {
     public static final FPConfigManager CONFIG_MANAGER = FPConfigManager.getInstance(FMLPaths.CONFIGDIR.get());
     private static final IEventBus forgeEventBus = MinecraftForge.EVENT_BUS;
     private static final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+    public static final int CONTAINER_ROWS = 5; // TODO: Make it configurable.
 
     public FiltPick() {
         NetworkHandler.registerAll();

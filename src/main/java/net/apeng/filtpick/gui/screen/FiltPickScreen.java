@@ -14,7 +14,6 @@ import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.components.WidgetTooltipHolder;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
@@ -34,7 +33,7 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
     public static final int DESTRUCTION_MODE_BUTTON_ID = 1;
     public static final int CLEAR_BUTTON_ID = 2;
     private static final Style EXPLANATION_STYLE = Style.EMPTY.withColor(ChatFormatting.DARK_GRAY).applyFormats(ChatFormatting.ITALIC);
-    private static final ResourceLocation BACKGROUND_TEXTURE = new ResourceLocation("textures/gui/container/shulker_box.png");
+    private static final ResourceLocation CONTAINER_BACKGROUND = new ResourceLocation("textures/gui/container/generic_54.png"); // This image includes both container window and inventory window
     private static final ResourceLocation FILT_MODE_BUTTON_TEXTURE = ResourceLocation.tryBuild(FiltPick.ID, "gui/filtmode_button.png");
     private static final ResourceLocation DESTRUCTION_BUTTON_TEXTURE = ResourceLocation.tryBuild(FiltPick.ID, "gui/destruction_button.png");
     private static final ResourceLocation CLEAR_BUTTON_TEXTURE = ResourceLocation.tryBuild(FiltPick.ID, "gui/clearlist_button.png");
@@ -50,8 +49,16 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
     @Override
     protected void init() {
         super.init();
-        setTitlePosition();
+        initCoordinates();
         addButtons();
+    }
+
+    private void initCoordinates() {
+        this.imageHeight = 114 + FiltPick.CONTAINER_ROWS * 18;
+        this.inventoryLabelY = this.imageHeight - 94;
+        this.leftPos = (this.width - this.imageWidth) / 2;
+        this.topPos = (this.height - this.imageHeight) / 2;
+        this.titleLabelX = 72;
     }
 
     private void addButtons() {
@@ -129,10 +136,6 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
 
     }
 
-    private void setTitlePosition() {
-        this.titleLabelX = 72;
-    }
-
     @Override
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
@@ -163,9 +166,16 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
 
     @Override
     protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
-        int i = (this.width - this.imageWidth) / 2;
-        int j = (this.height - this.imageHeight) / 2;
-        context.blit(BACKGROUND_TEXTURE, i, j, 0, 0, this.imageWidth, this.imageHeight);
+        renderFiltPickContainer(context);
+        renderInventory(context);
+    }
+
+    private void renderInventory(GuiGraphics context) {
+        context.blit(CONTAINER_BACKGROUND, leftPos, topPos + FiltPick.CONTAINER_ROWS * 18 + 17, 0, 126, imageWidth, 96);
+    }
+
+    private void renderFiltPickContainer(GuiGraphics context) {
+        context.blit(CONTAINER_BACKGROUND, leftPos, topPos, 0, 0, imageWidth, FiltPick.CONTAINER_ROWS * 18 + 17);
     }
 
     private void sendButtonClickC2SPacket(int buttonId) {
