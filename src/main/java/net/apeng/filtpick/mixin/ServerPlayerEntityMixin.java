@@ -2,6 +2,7 @@ package net.apeng.filtpick.mixin;
 
 
 import com.mojang.authlib.GameProfile;
+import net.apeng.filtpick.FiltPick;
 import net.apeng.filtpick.gui.screen.FiltPickScreen;
 import net.apeng.filtpick.mixinduck.FiltListContainer;
 import net.apeng.filtpick.gui.util.ExtendedMenuProvider;
@@ -34,7 +35,7 @@ public abstract class ServerPlayerEntityMixin extends Player implements FiltList
     @Shadow public abstract ServerLevel serverLevel();
 
     @Unique
-    private SimpleContainer filtList = new SimpleContainer(27);
+    private SimpleContainer filtList = new SimpleContainer(FiltPick.CONTAINER_SIZE);
 
     @Unique
     private FiltListPropertyDelegate filtListPropertyDelegate = new FiltListPropertyDelegate();

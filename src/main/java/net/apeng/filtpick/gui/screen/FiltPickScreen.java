@@ -3,7 +3,9 @@ package net.apeng.filtpick.gui.screen;
 
 import net.apeng.filtpick.FiltPick;
 import net.apeng.filtpick.config.FPConfigManager;
+import net.apeng.filtpick.gui.widget.ContainerScrollBlock;
 import net.apeng.filtpick.gui.widget.LegacyTexturedButton;
+import net.apeng.filtpick.mixinduck.FiltListContainer;
 import net.apeng.filtpick.util.IntBoolConvertor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
@@ -41,6 +43,7 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
 
     private FPToggleButton filtModeButton, destructionButton;
     private LegacyTexturedButton clearButton, returnButton;
+    private ContainerScrollBlock scrollBlock;
 
     public FiltPickScreen(FiltPickMenu handler, Inventory inventory, Component title) {
         super(handler, inventory, title);
@@ -51,10 +54,73 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
         super.init();
         initCoordinates();
         addButtons();
+        scrollBlock = new ContainerScrollBlock(
+                leftPos + imageWidth + 2,
+                topPos + 4,
+                110,
+                FiltPick.FILTLIST_DISPLAYED_ROW_NUM,
+                FiltPick.CONTAINER_SIZE / 9
+        );
+        this.addRenderableWidget(scrollBlock);
     }
 
+//    @Override
+//    public boolean mouseScrolled(double pMouseX, double pMouseY, double pDeltaX, double pDeltaY) {
+//        if (scrollBlock.mouseScrolled(pMouseX, pMouseY, pDeltaX, pDeltaY)) {
+//            onScrollBarScrolled(pDeltaY);
+//            return true;
+//        }
+//        return super.mouseScrolled(pMouseX, pMouseY, pDeltaX, pDeltaY);
+//    }
+
+//    /**
+//     * @param pDelta >0 means scrolling up, <0 means scrolling down.
+//     */
+//    protected void onScrollBarScrolled(double pDelta) {
+//        if (pDelta > 0) {
+//            scrollUpListAndSyn();
+//        } else {
+//            scrollDownListAndSyn();
+//        }
+//    }
+
+//    private void scrollDownListAndSyn() {
+//        if (menu.safeIncreaseDisplayedRowOffsetAndUpdate()) {
+//            scrollBar.setRowOffset(menu.getDisplayedRowOffset());
+//        }
+//    }
+//
+//    private void scrollUpListAndSyn() {
+//        if (menu.safeDecreaseDisplayedRowOffsetAndUpdate()) {
+//            scrollBar.setRowOffset(menu.getDisplayedRowOffset());
+//        }
+//    }
+//
+//    @Override
+//    public boolean mouseDragged(double pMouseX, double pMouseY, int pButton, double pDragX, double pDragY) {
+//        if (this.getFocused() instanceof ContainerScrollBar scrollBar && this.isDragging() && pButton == 0) {
+//            return scrollBarDragged(pMouseX, pMouseY, pButton, pDragX, pDragY, scrollBar);
+//        } else {
+//            return normalDragged(pMouseX, pMouseY, pButton, pDragX, pDragY);
+//        }
+//    }
+//
+//    private boolean scrollBarDragged(double pMouseX, double pMouseY, int pButton, double pDragX, double pDragY, ContainerScrollBar scrollBar) {
+//        boolean flag = scrollBar.mouseDragged(pMouseX, pMouseY, pButton, pDragX, pDragY);
+//        menu.setDisplayedRowOffsetAndUpdate(scrollBar.getDisplayedRowOffset());
+//        return flag;
+//    }
+//
+//    private boolean normalDragged(double pMouseX, double pMouseY, int pButton, double pDragX, double pDragY) {
+//        if (this.getFocused() != null && this.isDragging() && pButton == 0) {
+//            return this.getFocused().mouseDragged(pMouseX, pMouseY, pButton, pDragX, pDragY);
+//        }
+//        return super.mouseDragged(pMouseX, pMouseY, pButton, pDragX, pDragY);
+//    }
+
+
     private void initCoordinates() {
-        this.imageHeight = 114 + FiltPick.CONTAINER_ROWS * 18;
+        this.imageHeight = 114 + FiltPick.FILTLIST_DISPLAYED_ROW_NUM * 18;
         this.inventoryLabelY = this.imageHeight - 94;
         this.leftPos = (this.width - this.imageWidth) / 2;
         this.topPos = (this.height - this.imageHeight) / 2;
@@ -171,11 +237,11 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
     }
 
     private void renderInventory(GuiGraphics context) {
-        context.blit(CONTAINER_BACKGROUND, leftPos, topPos + FiltPick.CONTAINER_ROWS * 18 + 17, 0, 126, imageWidth, 96);
+        context.blit(CONTAINER_BACKGROUND, leftPos, topPos + FiltPick.FILTLIST_DISPLAYED_ROW_NUM * 18 + 17, 0, 126, imageWidth, 96);
     }
 
     private void renderFiltPickContainer(GuiGraphics context) {
-        context.blit(CONTAINER_BACKGROUND, leftPos, topPos, 0, 0, imageWidth, FiltPick.CONTAINER_ROWS * 18 + 17);
+        context.blit(CONTAINER_BACKGROUND, leftPos, topPos, 0, 0, imageWidth, FiltPick.FILTLIST_DISPLAYED_ROW_NUM * 18 + 17);
     }
 
     private void sendButtonClickC2SPacket(int buttonId) {

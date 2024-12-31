@@ -23,10 +23,11 @@ public class FiltPickMenu extends AbstractContainerMenu {
     private final ContainerData propertyDelegate;
     private final Inventory playerInventory;
     private final Container filtList;
+    private int displayedRowOffset = 0;
 
     // For client side
     public FiltPickMenu(int syncId, Inventory playerInventory) {
-        this(syncId, playerInventory, new SimpleContainer(27), new SimpleContainerData(2));
+        this(syncId, playerInventory, new SimpleContainer(FiltPick.CONTAINER_SIZE), new SimpleContainerData(2));
     }
 
     // For server side        
@@ -35,14 +36,8 @@ public class FiltPickMenu extends AbstractContainerMenu {
         this.propertyDelegate = propertyDelegate;
         this.playerInventory = playerInventory;
         this.filtList = filtList;
-        checkSize(filtList, propertyDelegate);
         addSlots(playerInventory, filtList);
         addDataSlots(propertyDelegate);
-    }
-
-    private static void checkSize(Container filtList, ContainerData propertyDelegate) {
-        checkContainerSize(filtList, 27);
-        checkContainerDataCount(propertyDelegate, 2);
     }
 
     private static boolean inventorySlotClicked(int slotIndex) {
@@ -50,10 +45,25 @@ public class FiltPickMenu extends AbstractContainerMenu {
     }
 
     private void addSlots(Inventory playerInventory, Container filtList) {
-        addHotbarSlots(playerInventory);
-        addInventorySlots(playerInventory);
-        // FiltList must be added at last
+        int i = (FiltPick.FILTLIST_DISPLAYED_ROW_NUM - 4) * 18;
+        addHotBarSlots(playerInventory, i);
+        addInventorySlot(playerInventory, i);
+        // FiltList must be added at last for #inventorySlotClicked working properly.
         addFiltList(filtList);
+    }
+
+    private void addInventorySlot(Inventory playerInventory, int i) {
+        for(int l = 0; l < 3; ++l) {
+            for(int j1 = 0; j1 < 9; ++j1) {
+                this.addSlot(new Slot(playerInventory, j1 + l * 9 + 9, 8 + j1 * 18, 103 + l * 18 + i));
+            }
+        }
+    }
+
+    private void addHotBarSlots(Inventory playerInventory, int i) {
+        for(int i1 = 0; i1 < 9; ++i1) {
+            this.addSlot(new Slot(playerInventory, i1, 8 + i1 * 18, 161 + i));
+        }
     }
 
     /**
@@ -77,25 +87,17 @@ public class FiltPickMenu extends AbstractContainerMenu {
         return propertyDelegate;
     }
 
-    private void addHotbarSlots(Inventory playerInventory) {
-        for (int i = 0; i < 9; ++i) {
-            this.addSlot(new Slot(playerInventory, i, 8 + i * 18, 142));
-        }
-    }
-
-    private void addInventorySlots(Inventory playerInventory) {
-        for (int i = 0; i < 3; ++i) {
-            for (int j = 0; j < 9; ++j) {
-                this.addSlot(new Slot(playerInventory, j + (i + 1) * 9, 8 + j * 18, 84 + i * 18));
-            }
-        }
-    }
-
     private void addFiltList(Container filtList) {
-        // Add slots for data inventory
-        for (int i = 0; i < 3; i++) {
-            for (int j = 0; j < 9; j++) {
-                this.addSlot(new Slot(filtList, i * 9 + j, 8 + j * 18, 18 + i * 18));
+        for (int row = 0; row < FiltPick.FILTLIST_DISPLAYED_ROW_NUM; row++) {
+            for (int col = 0; col < 9; col++) {
+                int index = row * 9 + col;
+                if (index >= filtList.getContainerSize()) {
+                    FiltPick.LOGGER.warn(String.format("The size of displayed filtpick window (size: %d) is bigger than " +
+                            "actual filtpick container size of the player (size: %d). " +
+                            "Excess slots of the window won't be used.", FiltPick.FILTLIST_DISPLAYED_ROW_NUM * 9, filtList.getContainerSize()));
+                    return;
+                }
+                this.addSlot(new Slot(filtList, index, 8 + col * 18, 18 + row * 18));
             }
         }
     }
@@ -148,7 +150,7 @@ public class FiltPickMenu extends AbstractContainerMenu {
      *
      * @param slotIndex
      * @param button
-     * @param actionType the type of slot click, check the docs for each {@link SlotActionType} value for details
+     * @param actionType the type of slot click, check the docs for each {@link ClickType} value for details
      * @param player
      */
     @Override

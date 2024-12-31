@@ -22,10 +22,10 @@ public class ScrollBlock extends AbstractWidget {
      * @param scrollSlotHeight the height of the slot in which the scroll bar scrolls.
      */
     public ScrollBlock(int pX, int pY, int scrollSlotHeight) {
-        super(pX, pY, ScrollBarResource.WIDTH, ScrollBarResource.HEIGHT, Component.empty());
+        super(pX, pY, ScrollBlockResource.WIDTH, ScrollBlockResource.HEIGHT, Component.empty());
         this.upBoundY = pY;
         this.scrollSlotHeight = scrollSlotHeight;
-        this.scrollSpaceY = scrollSlotHeight - ScrollBarResource.HEIGHT;
+        this.scrollSpaceY = scrollSlotHeight - ScrollBlockResource.HEIGHT;
     }
 
     /**
@@ -36,10 +36,10 @@ public class ScrollBlock extends AbstractWidget {
      * @param active if scroll block is active
      */
     public ScrollBlock(int pX, int pY, int scrollSlotHeight, boolean active) {
-        super(pX, pY, ScrollBarResource.WIDTH, ScrollBarResource.HEIGHT, Component.empty());
+        super(pX, pY, ScrollBlockResource.WIDTH, ScrollBlockResource.HEIGHT, Component.empty());
         this.upBoundY = pY;
         this.scrollSlotHeight = scrollSlotHeight;
-        this.scrollSpaceY = scrollSlotHeight - ScrollBarResource.HEIGHT;
+        this.scrollSpaceY = scrollSlotHeight - ScrollBlockResource.HEIGHT;
         this.active = active;
     }
 
@@ -52,14 +52,12 @@ public class ScrollBlock extends AbstractWidget {
      */
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-        guiGraphics.blit(
-                ScrollBarResource.LOCATION,
+        guiGraphics.blitSprite(
+                isActive() ? ScrollBlockResource.SPRITE_LOCATION : ScrollBlockResource.SPRITE_LOCATION_DISABLED,
                 getX(),
                 getY(),
-                ScrollBarResource.U + (this.isActive() ? 0 : ScrollBarResource.WIDTH),
-                ScrollBarResource.V,
-                ScrollBarResource.WIDTH,
-                ScrollBarResource.HEIGHT
+                ScrollBlockResource.WIDTH,
+                ScrollBlockResource.HEIGHT
         );
     }
 
@@ -107,7 +105,7 @@ public class ScrollBlock extends AbstractWidget {
     }
 
     protected void onDrag(double pMouseX, double pMouseY, double pDragX, double pDragY) {
-        setY(Mth.clamp((int)pMouseY - ScrollBarResource.HEIGHT / 2, upBoundY, upBoundY + scrollSpaceY));
+        setY(Mth.clamp((int)pMouseY - ScrollBlockResource.HEIGHT / 2, upBoundY, upBoundY + scrollSpaceY));
     }
 
     /**
@@ -147,9 +145,11 @@ public class ScrollBlock extends AbstractWidget {
         setY(upBoundY + offsetY);
     }
 
-    public static class ScrollBarResource {
-        public static final ResourceLocation LOCATION = new ResourceLocation("textures/gui/container/creative_inventory/tabs.png");
-        public static final int U = 232;
+    public static class ScrollBlockResource {
+        // Use guiGraphics#blitSprite to render the block instead of #blit
+        public static final ResourceLocation SPRITE_LOCATION = new ResourceLocation("container/creative_inventory/scroller");
+        public static final ResourceLocation SPRITE_LOCATION_DISABLED = new ResourceLocation("container/creative_inventory/scroller_disabled");
+        public static final int U = 0;
         public static final int V = 0;
         public static final int WIDTH = 12;
         public static final int HEIGHT = 15;
