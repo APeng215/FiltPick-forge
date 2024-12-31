@@ -209,10 +209,21 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
         this.renderTooltip(context, mouseX, mouseY);
     }
 
+    /**
+     * This approach to render can roll the title if it's too long
+     * @param context
+     * @param textRenderer
+     * @param text
+     * @param startX
+     * @param startY
+     * @param endX
+     * @param endY
+     * @param color
+     */
     protected void renderTitle(GuiGraphics context, Font textRenderer, Component text, int startX, int startY, int endX, int endY, int color) {
         int centerX = (startX + endX) / 2;
         int i = textRenderer.width(text);
-        int j = (startY + endY - textRenderer.lineHeight) / 2 + 1;
+        int j = (startY + endY - textRenderer.lineHeight) / 2 + 2;
         int k = endX - startX;
         if (i > k) {
             int l = i - k;
