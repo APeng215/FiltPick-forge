@@ -24,7 +24,7 @@ public class FiltPick {
     public static final FPConfigManager CONFIG_MANAGER = FPConfigManager.getInstance(FMLPaths.CONFIGDIR.get());
     private static final IEventBus forgeEventBus = MinecraftForge.EVENT_BUS;
     private static final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-    public static final int CONTAINER_SIZE = 9 * 11; // TODO: Make it configurable.
+    public static final int CONTAINER_SIZE = 9 * 6; // TODO: Make it configurable.
     public static final int FILTLIST_DISPLAYED_ROW_NUM = 5; // TODO: Make it configurable.
 
     public FiltPick() {

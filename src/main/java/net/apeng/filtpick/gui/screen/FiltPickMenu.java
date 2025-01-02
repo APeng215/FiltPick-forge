@@ -2,7 +2,11 @@ package net.apeng.filtpick.gui.screen;
 
 import net.apeng.filtpick.FiltPick;
 import net.apeng.filtpick.mixinduck.FiltListContainer;
+import net.apeng.filtpick.network.NetworkHandler;
+import net.apeng.filtpick.network.SynMenuFieldC2SPacket;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.protocol.game.ServerboundContainerButtonClickPacket;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -24,19 +28,25 @@ public class FiltPickMenu extends AbstractContainerMenu {
     private final Inventory playerInventory;
     private final Container filtList;
     private int displayedRowOffset = 0;
+    private final int MAX_DISPLAYED_ROW_OFFSET;
+
+    private int getActualRowNum() {
+        return (int) Math.ceil(filtList.getContainerSize() / 9.0);
+    }
 
     // For client side
     public FiltPickMenu(int syncId, Inventory playerInventory) {
         this(syncId, playerInventory, new SimpleContainer(FiltPick.CONTAINER_SIZE), new SimpleContainerData(2));
     }
 
-    // For server side        
+    // For server side
     public FiltPickMenu(int syncId, Inventory playerInventory, Container filtList, ContainerData propertyDelegate) {
         super(TYPE.get(), syncId);
         this.propertyDelegate = propertyDelegate;
         this.playerInventory = playerInventory;
         this.filtList = filtList;
-        addSlots(playerInventory, filtList);
+        this.MAX_DISPLAYED_ROW_OFFSET = Math.max(0, getActualRowNum() - FiltPick.FILTLIST_DISPLAYED_ROW_NUM);
+        addAllSlots(playerInventory, filtList);
         addDataSlots(propertyDelegate);
     }
 
@@ -44,25 +54,25 @@ public class FiltPickMenu extends AbstractContainerMenu {
         return slotIndex < 36;
     }
 
-    private void addSlots(Inventory playerInventory, Container filtList) {
-        int i = (FiltPick.FILTLIST_DISPLAYED_ROW_NUM - 4) * 18;
-        addHotBarSlots(playerInventory, i);
-        addInventorySlot(playerInventory, i);
+    private void addAllSlots(Inventory playerInventory, Container filtList) {
+        int pixelOffset = (FiltPick.FILTLIST_DISPLAYED_ROW_NUM - 4) * 18;
+        addHotBarSlots(playerInventory, pixelOffset);
+        addInventorySlot(playerInventory, pixelOffset);
         // FiltList must be added at last for #inventorySlotClicked working properly.
         addFiltList(filtList);
     }
 
-    private void addInventorySlot(Inventory playerInventory, int i) {
+    private void addInventorySlot(Inventory playerInventory, int pixelOffset) {
         for(int l = 0; l < 3; ++l) {
             for(int j1 = 0; j1 < 9; ++j1) {
-                this.addSlot(new Slot(playerInventory, j1 + l * 9 + 9, 8 + j1 * 18, 103 + l * 18 + i));
+                this.addSlot(new Slot(playerInventory, j1 + l * 9 + 9, 8 + j1 * 18, 103 + l * 18 + pixelOffset));
             }
         }
     }
 
-    private void addHotBarSlots(Inventory playerInventory, int i) {
+    private void addHotBarSlots(Inventory playerInventory, int pixelOffset) {
         for(int i1 = 0; i1 < 9; ++i1) {
-            this.addSlot(new Slot(playerInventory, i1, 8 + i1 * 18, 161 + i));
+            this.addSlot(new Slot(playerInventory, i1, 8 + i1 * 18, 161 + pixelOffset));
         }
     }
 
@@ -90,7 +100,7 @@ public class FiltPickMenu extends AbstractContainerMenu {
     private void addFiltList(Container filtList) {
         for (int row = 0; row < FiltPick.FILTLIST_DISPLAYED_ROW_NUM; row++) {
             for (int col = 0; col < 9; col++) {
-                int index = row * 9 + col;
+                int index = row * 9 + col + displayedRowOffset * 9;
                 if (index >= filtList.getContainerSize()) {
                     FiltPick.LOGGER.warn(String.format("The size of displayed filtpick window (size: %d) is bigger than " +
                             "actual filtpick container size of the player (size: %d). " +
@@ -163,7 +173,7 @@ public class FiltPickMenu extends AbstractContainerMenu {
     }
 
     private void onFiltSlotClicked(int slotIndex, ClickType actionType) {
-        int filtSlotIndex = slotIndex - 36;
+        int filtSlotIndex = slotIndex - 36 + 9 * displayedRowOffset;
         switch (actionType) {
             case THROW, QUICK_MOVE -> setFiltStackEmpty(filtSlotIndex);
             case PICKUP, QUICK_CRAFT -> setFiltStackCursorItem(filtSlotIndex);
@@ -196,6 +206,79 @@ public class FiltPickMenu extends AbstractContainerMenu {
     @Override
     public boolean canTakeItemForPickAll(ItemStack cursorStack, Slot pickedSlot) {
         return pickedSlot.container == playerInventory;
+    }
+
+    public int getDisplayedRowOffset() {
+        return displayedRowOffset;
+    }
+
+    /**
+     * Safe means the row offset will never be out of the bound.
+     * @return whether displayedRowOffset has been changed
+     */
+    public boolean safeIncreaseDisplayedRowOffsetAndUpdate() {
+        int oldDisplayedRowOffset = displayedRowOffset;
+        safeIncreaseDisplayedRowOffset();
+        synDisplayedRowOffsetWithServer();
+        updateSlots();
+        return oldDisplayedRowOffset != displayedRowOffset;
+    }
+
+    private void safeIncreaseDisplayedRowOffset() {
+        displayedRowOffset = Math.min(displayedRowOffset + 1, MAX_DISPLAYED_ROW_OFFSET);
+    }
+
+    /**
+     * Safe means the row offset will never be out of the bound.
+     * @return whether displayedRowOffset has been changed
+     */
+    public boolean safeDecreaseDisplayedRowOffsetAndUpdate() {
+        int oldDisplayedRowOffset = displayedRowOffset;
+        safeDecreaseDisplayedRowOffset();
+        synDisplayedRowOffsetWithServer();
+        updateSlots();
+        return oldDisplayedRowOffset != displayedRowOffset;
+    }
+
+    private void safeDecreaseDisplayedRowOffset() {
+        displayedRowOffset = Math.max(displayedRowOffset - 1, 0);
+    }
+
+    private void updateSlots() {
+        clearAllSlots();
+        addAllSlots(playerInventory, filtList);
+    }
+
+    private void clearAllSlots() {
+        this.slots.clear();
+        this.lastSlots.clear();
+        this.remoteSlots.clear();
+    }
+
+    /**
+     * Be careful of that it is possible that the offset be out of the bound.
+     * @param displayedRowOffset
+     */
+    public void setDisplayedRowOffsetAndUpdate(int displayedRowOffset) {
+        this.displayedRowOffset = displayedRowOffset;
+        synDisplayedRowOffsetWithServer();
+        updateSlots();
+    }
+
+    /**
+     * Will only be executed on the client side.
+     * @return SynMenuFieldC2SPacket has been sent
+     */
+    private boolean synDisplayedRowOffsetWithServer() {
+        if(isClientSide()) {
+            NetworkHandler.send2Server(new SynMenuFieldC2SPacket(displayedRowOffset));
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isClientSide() {
+        return !(this.playerInventory.player instanceof ServerPlayer);
     }
 
 }

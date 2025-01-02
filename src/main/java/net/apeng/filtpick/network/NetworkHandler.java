@@ -18,6 +18,11 @@ public class NetworkHandler {
                 .encoder(OpenFiltPickScreenC2SPacket::encode)
                 .decoder(OpenFiltPickScreenC2SPacket::new)
                 .consumerMainThread(OpenFiltPickScreenC2SPacket::handle)
+                .add()
+                .messageBuilder(SynMenuFieldC2SPacket.class)
+                .encoder(SynMenuFieldC2SPacket::encode)
+                .decoder(SynMenuFieldC2SPacket::new)
+                .consumerMainThread(SynMenuFieldC2SPacket::handle)
                 .add();
     }
 
