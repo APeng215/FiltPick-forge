@@ -50,8 +50,13 @@ public class FiltPickMenu extends AbstractContainerMenu {
         addDataSlots(propertyDelegate);
     }
 
-    private static boolean inventorySlotClicked(int slotIndex) {
-        return slotIndex < 36;
+    /**
+     * Inventory slots is added to the menu at first. See {@link #addAllSlots} for more details.
+     * @param indexOfMenu
+     * @return whether this slot of the menu belongs to inventory.
+     */
+    private static boolean inventorySlotClicked(int indexOfMenu) {
+        return indexOfMenu < 36;
     }
 
     private void addAllSlots(Inventory playerInventory, Container filtList) {
@@ -158,17 +163,17 @@ public class FiltPickMenu extends AbstractContainerMenu {
      * Performs a slot click. This can behave in many different ways depending mainly on the action type.
      * Logic comes from Create Mod.
      *
-     * @param slotIndex
+     * @param indexOfMenu
      * @param button
      * @param actionType the type of slot click, check the docs for each {@link ClickType} value for details
      * @param player
      */
     @Override
-    public void clicked(int slotIndex, int button, ClickType actionType, Player player) {
-        if (inventorySlotClicked(slotIndex)) {
-            super.clicked(slotIndex, button, actionType, player);
+    public void clicked(int indexOfMenu, int button, ClickType actionType, Player player) {
+        if (inventorySlotClicked(indexOfMenu)) {
+            super.clicked(indexOfMenu, button, actionType, player);
         } else {
-            onFiltSlotClicked(slotIndex, actionType);
+            onFiltSlotClicked(indexOfMenu, actionType);
         }
     }
 
