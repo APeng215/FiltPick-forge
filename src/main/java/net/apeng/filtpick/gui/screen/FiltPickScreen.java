@@ -2,7 +2,7 @@ package net.apeng.filtpick.gui.screen;
 
 
 import net.apeng.filtpick.FiltPick;
-import net.apeng.filtpick.config.FPConfigManager;
+import net.apeng.filtpick.config.FiltPickConfig;
 import net.apeng.filtpick.gui.widget.ContainerScrollBlock;
 import net.apeng.filtpick.gui.widget.LegacyTexturedButton;
 import net.apeng.filtpick.util.IntBoolConvertor;
@@ -136,8 +136,8 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
 
     private void addFiltModeButton() {
         filtModeButton = new FPToggleButton(
-                this.leftPos + 10 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.FILT_MODE_BUTTON).xOffset(),
-                this.topPos + 4 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.FILT_MODE_BUTTON).yOffset(),
+                this.leftPos + 10 + FiltPick.CONFIG.buttonOffsets.get(FiltPickConfig.ButtonName.FILT_MODE_BUTTON).horizontalOffset().get(),
+                this.topPos + 4 + FiltPick.CONFIG.buttonOffsets.get(FiltPickConfig.ButtonName.FILT_MODE_BUTTON).verticalOffset().get(),
                 12,
                 11,
                 FILT_MODE_BUTTON_TEXTURE,
@@ -149,8 +149,8 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
 
     private void addDestructionButton() {
         destructionButton = new FPToggleButton(
-                this.leftPos + 10 + 2 + 12 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.DESTRUCTION_MODE_BUTTON).xOffset(),
-                this.topPos + 4 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.DESTRUCTION_MODE_BUTTON).yOffset(),
+                this.leftPos + 10 + 2 + 12 + FiltPick.CONFIG.buttonOffsets.get(FiltPickConfig.ButtonName.DESTRUCTION_MODE_BUTTON).horizontalOffset().get(),
+                this.topPos + 4 + FiltPick.CONFIG.buttonOffsets.get(FiltPickConfig.ButtonName.DESTRUCTION_MODE_BUTTON).verticalOffset().get(),
                 12,
                 11,
                 DESTRUCTION_BUTTON_TEXTURE,
@@ -162,8 +162,8 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
 
     private void addClearButton() {
         clearButton = new LegacyTexturedButton(
-                this.leftPos + 154 - 14 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.CLEAR_BUTTON).xOffset(),
-                this.topPos + 4 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.CLEAR_BUTTON).yOffset(),
+                this.leftPos + 154 - 14 + FiltPick.CONFIG.buttonOffsets.get(FiltPickConfig.ButtonName.CLEAR_BUTTON).horizontalOffset().get(),
+                this.topPos + 4 + FiltPick.CONFIG.buttonOffsets.get(FiltPickConfig.ButtonName.CLEAR_BUTTON).verticalOffset().get(),
                 12,
                 11,
                 0,
@@ -183,8 +183,8 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
 
     private void addReturnButton() {
         returnButton = new LegacyTexturedButton(
-                this.leftPos + 154 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.RETURN_BUTTON).xOffset(),
-                this.topPos + 4 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.RETURN_BUTTON).yOffset(),
+                this.leftPos + 154 + FiltPick.CONFIG.buttonOffsets.get(FiltPickConfig.ButtonName.RETURN_BUTTON).horizontalOffset().get(),
+                this.topPos + 4 + FiltPick.CONFIG.buttonOffsets.get(FiltPickConfig.ButtonName.RETURN_BUTTON).verticalOffset().get(),
                 12,
                 11,
                 0,
