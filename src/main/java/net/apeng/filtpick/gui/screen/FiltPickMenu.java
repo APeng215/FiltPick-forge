@@ -36,7 +36,7 @@ public class FiltPickMenu extends AbstractContainerMenu {
 
     // For client side
     public FiltPickMenu(int syncId, Inventory playerInventory) {
-        this(syncId, playerInventory, new SimpleContainer(FiltPick.CONTAINER_SIZE), new SimpleContainerData(2));
+        this(syncId, playerInventory, new SimpleContainer(FiltPick.SERVER_CONFIG.CONTAINER_SIZE.get()), new SimpleContainerData(2));
     }
 
     // For server side
@@ -45,7 +45,7 @@ public class FiltPickMenu extends AbstractContainerMenu {
         this.propertyDelegate = propertyDelegate;
         this.playerInventory = playerInventory;
         this.filtList = filtList;
-        this.MAX_DISPLAYED_ROW_OFFSET = Math.max(0, getActualRowNum() - FiltPick.FILTLIST_DISPLAYED_ROW_NUM);
+        this.MAX_DISPLAYED_ROW_OFFSET = Math.max(0, getActualRowNum() - FiltPick.CLIENT_CONFIG.FILTLIST_DISPLAYED_ROW_NUM.get());
         addAllSlots(playerInventory, filtList);
         addDataSlots(propertyDelegate);
     }
@@ -60,7 +60,7 @@ public class FiltPickMenu extends AbstractContainerMenu {
     }
 
     private void addAllSlots(Inventory playerInventory, Container filtList) {
-        int pixelOffset = (FiltPick.FILTLIST_DISPLAYED_ROW_NUM - 4) * 18;
+        int pixelOffset = (FiltPick.CLIENT_CONFIG.FILTLIST_DISPLAYED_ROW_NUM.get() - 4) * 18;
         addHotBarSlots(playerInventory, pixelOffset);
         addInventorySlot(playerInventory, pixelOffset);
         // FiltList must be added at last for #inventorySlotClicked working properly.
@@ -103,13 +103,13 @@ public class FiltPickMenu extends AbstractContainerMenu {
     }
 
     private void addFiltList(Container filtList) {
-        for (int row = 0; row < FiltPick.FILTLIST_DISPLAYED_ROW_NUM; row++) {
+        for (int row = 0; row < FiltPick.CLIENT_CONFIG.FILTLIST_DISPLAYED_ROW_NUM.get(); row++) {
             for (int col = 0; col < 9; col++) {
                 int index = row * 9 + col + displayedRowOffset * 9;
                 if (index >= filtList.getContainerSize()) {
                     FiltPick.LOGGER.warn(String.format("The size of displayed filtpick window (size: %d) is bigger than " +
                             "actual filtpick container size of the player (size: %d). " +
-                            "Excess slots of the window won't be used.", FiltPick.FILTLIST_DISPLAYED_ROW_NUM * 9, filtList.getContainerSize()));
+                            "Excess slots of the window won't be used.", FiltPick.CLIENT_CONFIG.FILTLIST_DISPLAYED_ROW_NUM.get() * 9, filtList.getContainerSize()));
                     return;
                 }
                 this.addSlot(new Slot(filtList, index, 8 + col * 18, 18 + row * 18));

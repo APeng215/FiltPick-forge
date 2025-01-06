@@ -1,7 +1,7 @@
 package net.apeng.filtpick.mixin;
 
 import net.apeng.filtpick.FiltPick;
-import net.apeng.filtpick.config.FiltPickConfig;
+import net.apeng.filtpick.config.FiltPickClientConfig;
 import net.apeng.filtpick.gui.widget.LegacyTexturedButton;
 import net.apeng.filtpick.network.NetworkHandler;
 import net.apeng.filtpick.network.OpenFiltPickScreenC2SPacket;
@@ -93,8 +93,8 @@ public abstract class InventoryScreenMixin extends EffectRenderingInventoryScree
      */
     @Unique
     private void calculateEntryButtonPos() {
-        filtPickEntryButtonPosX = this.leftPos + 104 + 23 + FiltPick.CONFIG.buttonOffsets.get(FiltPickConfig.ButtonName.ENTRY_BUTTON).horizontalOffset().get();
-        filtPickEntryButtonPosY = this.height / 2 - 22 + FiltPick.CONFIG.buttonOffsets.get(FiltPickConfig.ButtonName.ENTRY_BUTTON).verticalOffset().get();
+        filtPickEntryButtonPosX = this.leftPos + 104 + 23 + FiltPick.CLIENT_CONFIG.buttonOffsets.get(FiltPickClientConfig.ButtonName.ENTRY_BUTTON).horizontalOffset().get();
+        filtPickEntryButtonPosY = this.height / 2 - 22 + FiltPick.CLIENT_CONFIG.buttonOffsets.get(FiltPickClientConfig.ButtonName.ENTRY_BUTTON).verticalOffset().get();
     }
 
     /**
@@ -102,8 +102,8 @@ public abstract class InventoryScreenMixin extends EffectRenderingInventoryScree
      */
     @Unique
     private void calculateRecipeButtonPos() {
-        recipeButtonPosX = this.leftPos + 104 + FiltPick.CONFIG.buttonOffsets.get(FiltPickConfig.ButtonName.RECIPE_BUTTON).horizontalOffset().get();
-        recipeButtonPosY = this.height / 2 - 22 + FiltPick.CONFIG.buttonOffsets.get(FiltPickConfig.ButtonName.RECIPE_BUTTON).verticalOffset().get();
+        recipeButtonPosX = this.leftPos + 104 + FiltPick.CLIENT_CONFIG.buttonOffsets.get(FiltPickClientConfig.ButtonName.RECIPE_BUTTON).horizontalOffset().get();
+        recipeButtonPosY = this.height / 2 - 22 + FiltPick.CLIENT_CONFIG.buttonOffsets.get(FiltPickClientConfig.ButtonName.RECIPE_BUTTON).verticalOffset().get();
     }
 
     @Unique
