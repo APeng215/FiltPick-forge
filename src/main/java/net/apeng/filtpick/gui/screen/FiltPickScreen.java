@@ -2,7 +2,7 @@ package net.apeng.filtpick.gui.screen;
 
 
 import net.apeng.filtpick.FiltPick;
-import net.apeng.filtpick.config.FPConfigManager;
+import net.apeng.filtpick.config.FiltPickClientConfig;
 import net.apeng.filtpick.gui.widget.ContainerScrollBlock;
 import net.apeng.filtpick.gui.widget.LegacyTexturedButton;
 import net.apeng.filtpick.util.IntBoolConvertor;
@@ -61,16 +61,23 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
                 leftPos + imageWidth + 2,
                 topPos + 4,
                 110,
-                FiltPick.FILTLIST_DISPLAYED_ROW_NUM,
-                FiltPick.CONTAINER_SIZE / 9
+                FiltPick.CLIENT_CONFIG.FILTLIST_DISPLAYED_ROW_NUM.get(),
+                FiltPick.SERVER_CONFIG.CONTAINER_SIZE.get() / 9
         );
         this.addRenderableWidget(scrollBlock);
     }
 
+    /**
+     *
+     * @param pMouseX
+     * @param pMouseY
+     * @param pDeltaX
+     * @param pDeltaY >0 means scrolling up; <0 means scrolling down
+     * @return
+     */
     @Override
     public boolean mouseScrolled(double pMouseX, double pMouseY, double pDeltaX, double pDeltaY) {
         if(!super.mouseScrolled(pMouseX, pMouseY, pDeltaX, pDeltaY)) {
-            scrollBlock.mouseScrolled(pMouseX, pMouseY, pDeltaX, pDeltaY);
             scrollMenu(pDeltaY);
         }
         return true;
@@ -120,7 +127,7 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
 
 
     private void initCoordinates() {
-        this.imageHeight = 114 + FiltPick.FILTLIST_DISPLAYED_ROW_NUM * 18;
+        this.imageHeight = 114 + FiltPick.CLIENT_CONFIG.FILTLIST_DISPLAYED_ROW_NUM.get() * 18;
         this.inventoryLabelY = this.imageHeight - 94;
         this.leftPos = (this.width - this.imageWidth) / 2;
         this.topPos = (this.height - this.imageHeight) / 2;
@@ -136,8 +143,8 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
 
     private void addFiltModeButton() {
         filtModeButton = new FPToggleButton(
-                this.leftPos + 10 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.FILT_MODE_BUTTON).xOffset(),
-                this.topPos + 4 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.FILT_MODE_BUTTON).yOffset(),
+                this.leftPos + 10 + FiltPick.CLIENT_CONFIG.buttonOffsets.get(FiltPickClientConfig.ButtonName.FILT_MODE_BUTTON).horizontalOffset().get(),
+                this.topPos + 4 + FiltPick.CLIENT_CONFIG.buttonOffsets.get(FiltPickClientConfig.ButtonName.FILT_MODE_BUTTON).verticalOffset().get(),
                 12,
                 11,
                 FILT_MODE_BUTTON_TEXTURE,
@@ -149,8 +156,8 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
 
     private void addDestructionButton() {
         destructionButton = new FPToggleButton(
-                this.leftPos + 10 + 2 + 12 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.DESTRUCTION_MODE_BUTTON).xOffset(),
-                this.topPos + 4 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.DESTRUCTION_MODE_BUTTON).yOffset(),
+                this.leftPos + 10 + 2 + 12 + FiltPick.CLIENT_CONFIG.buttonOffsets.get(FiltPickClientConfig.ButtonName.DESTRUCTION_MODE_BUTTON).horizontalOffset().get(),
+                this.topPos + 4 + FiltPick.CLIENT_CONFIG.buttonOffsets.get(FiltPickClientConfig.ButtonName.DESTRUCTION_MODE_BUTTON).verticalOffset().get(),
                 12,
                 11,
                 DESTRUCTION_BUTTON_TEXTURE,
@@ -162,8 +169,8 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
 
     private void addClearButton() {
         clearButton = new LegacyTexturedButton(
-                this.leftPos + 154 - 14 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.CLEAR_BUTTON).xOffset(),
-                this.topPos + 4 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.CLEAR_BUTTON).yOffset(),
+                this.leftPos + 154 - 14 + FiltPick.CLIENT_CONFIG.buttonOffsets.get(FiltPickClientConfig.ButtonName.CLEAR_BUTTON).horizontalOffset().get(),
+                this.topPos + 4 + FiltPick.CLIENT_CONFIG.buttonOffsets.get(FiltPickClientConfig.ButtonName.CLEAR_BUTTON).verticalOffset().get(),
                 12,
                 11,
                 0,
@@ -183,8 +190,8 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
 
     private void addReturnButton() {
         returnButton = new LegacyTexturedButton(
-                this.leftPos + 154 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.RETURN_BUTTON).xOffset(),
-                this.topPos + 4 + FiltPick.CONFIG_MANAGER.getWidgetPosOffset(FPConfigManager.WidgetOffsetConfig.Key.RETURN_BUTTON).yOffset(),
+                this.leftPos + 154 + FiltPick.CLIENT_CONFIG.buttonOffsets.get(FiltPickClientConfig.ButtonName.RETURN_BUTTON).horizontalOffset().get(),
+                this.topPos + 4 + FiltPick.CLIENT_CONFIG.buttonOffsets.get(FiltPickClientConfig.ButtonName.RETURN_BUTTON).verticalOffset().get(),
                 12,
                 11,
                 0,
@@ -248,11 +255,11 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
     }
 
     private void renderInventory(GuiGraphics context) {
-        context.blit(CONTAINER_BACKGROUND, leftPos, topPos + FiltPick.FILTLIST_DISPLAYED_ROW_NUM * 18 + 17, 0, 126, imageWidth, 96);
+        context.blit(CONTAINER_BACKGROUND, leftPos, topPos + FiltPick.CLIENT_CONFIG.FILTLIST_DISPLAYED_ROW_NUM.get() * 18 + 17, 0, 126, imageWidth, 96);
     }
 
     private void renderFiltPickContainer(GuiGraphics context) {
-        context.blit(CONTAINER_BACKGROUND, leftPos, topPos, 0, 0, imageWidth, FiltPick.FILTLIST_DISPLAYED_ROW_NUM * 18 + 17);
+        context.blit(CONTAINER_BACKGROUND, leftPos, topPos, 0, 0, imageWidth, FiltPick.CLIENT_CONFIG.FILTLIST_DISPLAYED_ROW_NUM.get() * 18 + 17);
     }
 
     private void sendButtonClickC2SPacket(int buttonId) {

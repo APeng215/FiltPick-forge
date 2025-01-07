@@ -35,7 +35,7 @@ public abstract class ServerPlayerEntityMixin extends Player implements FiltList
     @Shadow public abstract ServerLevel serverLevel();
 
     @Unique
-    private SimpleContainer filtList = new SimpleContainer(FiltPick.CONTAINER_SIZE);
+    private SimpleContainer filtList = new SimpleContainer(FiltPick.SERVER_CONFIG.CONTAINER_SIZE.get());
 
     @Unique
     private FiltListPropertyDelegate filtListPropertyDelegate = new FiltListPropertyDelegate();

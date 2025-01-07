@@ -8,15 +8,14 @@ instead of double y-coordinates.
  */
 public class ContainerScrollBlock extends ScrollBlock {
 
-    public final int actualRowNum;
-    public final int displayedRowNum;
-    public final int scrollSpaceInRow;
+    private final int actualRowNum;
+    private final int displayedRowNum;
+    private final int scrollSpaceInRow;
 
     private int displayedRowOffset = 0;
 
     /**
-     * ScrollBar constructed by this method is active by default.
-     *
+     * ScrollBar constructed by this method is inactive if actualRowNum is not bigger than displayedRowNum.
      * @param pX               x position of the scroll bar in its parent
      * @param pY               y position of the scroll bar in its parent
      * @param scrollSlotHeight the height of the slot in which the scroll bar scrolls in pixel.
@@ -24,10 +23,10 @@ public class ContainerScrollBlock extends ScrollBlock {
      * @param actualRowNum
      */
     public ContainerScrollBlock(int pX, int pY, int scrollSlotHeight, int displayedRowNum, int actualRowNum) {
-        super(pX, pY, scrollSlotHeight);
+        super(pX, pY, scrollSlotHeight, actualRowNum > displayedRowNum);
         this.displayedRowNum = displayedRowNum;
         this.actualRowNum = actualRowNum;
-        this.scrollSpaceInRow = actualRowNum - displayedRowNum;
+        this.scrollSpaceInRow = Math.max(actualRowNum - displayedRowNum, 0);
     }
 
     /**
@@ -44,7 +43,7 @@ public class ContainerScrollBlock extends ScrollBlock {
         super(pX, pY, scrollSlotHeight);
         this.displayedRowNum = displayedRowNum;
         this.actualRowNum = actualRowNum;
-        this.scrollSpaceInRow = actualRowNum - displayedRowNum;
+        this.scrollSpaceInRow = Math.max(actualRowNum - displayedRowNum, 0);
         this.displayedRowOffset = displayedRowOffset;
     }
 
@@ -60,7 +59,7 @@ public class ContainerScrollBlock extends ScrollBlock {
         super(pX, pY, scrollSlotHeight, active);
         this.displayedRowNum = displayedRowNum;
         this.actualRowNum = actualRowNum;
-        this.scrollSpaceInRow = actualRowNum - displayedRowNum;
+        this.scrollSpaceInRow = Math.max(actualRowNum - displayedRowNum, 0);
     }
 
 

@@ -1,18 +1,20 @@
 package net.apeng.filtpick;
 
 import com.mojang.logging.LogUtils;
-import net.apeng.filtpick.config.FPConfigManager;
-import net.apeng.filtpick.gui.screen.FiltPickScreen;
+import net.apeng.filtpick.config.FiltPickClientConfig;
+import net.apeng.filtpick.config.FiltPickServerConfig;
 import net.apeng.filtpick.gui.screen.FiltPickMenu;
+import net.apeng.filtpick.gui.screen.FiltPickScreen;
 import net.apeng.filtpick.network.NetworkHandler;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLConfig;
-import net.minecraftforge.fml.loading.FMLPaths;
 import org.slf4j.Logger;
 
 // The value here should match an entry in the META-INF/mods.toml file
@@ -21,24 +23,47 @@ public class FiltPick {
 
     public static final String ID = "filtpick";
     public static final Logger LOGGER = LogUtils.getLogger();
-    public static final FPConfigManager CONFIG_MANAGER = FPConfigManager.getInstance(FMLPaths.CONFIGDIR.get());
-    private static final IEventBus forgeEventBus = MinecraftForge.EVENT_BUS;
-    private static final IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-    public static final int CONTAINER_SIZE = 9 * 6; // TODO: Make it configurable.
-    public static final int FILTLIST_DISPLAYED_ROW_NUM = 5; // TODO: Make it configurable.
+
+    private static final IEventBus FORGE_EVENT_BUS = MinecraftForge.EVENT_BUS;
+    private static final IEventBus MOD_EVENT_BUS = FMLJavaModLoadingContext.get().getModEventBus();
+
+    public static FiltPickClientConfig CLIENT_CONFIG;
+    public static FiltPickServerConfig SERVER_CONFIG;
 
     public FiltPick() {
-        NetworkHandler.registerAll();
+        registerNetwork();
         registerMenu();
         registerScreen();
+        registerConfigs();
+    }
+
+    private static void registerNetwork() {
+        NetworkHandler.registerAll();
+    }
+
+    private static void registerConfigs() {
+        registerClientConfig();
+        registerServerConfig();
+    }
+
+    private static void registerClientConfig() {
+        ForgeConfigSpec.Builder clientBuilder = new ForgeConfigSpec.Builder();
+        CLIENT_CONFIG = FiltPickClientConfig.getInstance(clientBuilder); // Create singleton instance
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, clientBuilder.build());
+    }
+
+    private static void registerServerConfig() {
+        ForgeConfigSpec.Builder serverBuilder = new ForgeConfigSpec.Builder();
+        SERVER_CONFIG = FiltPickServerConfig.getInstance(serverBuilder); // Create singleton instance
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, serverBuilder.build());
     }
 
     private void registerScreen() {
-        modEventBus.addListener(this::registerMenuScreen);
+        MOD_EVENT_BUS.addListener(this::registerMenuScreen);
     }
 
     private void registerMenu() {
-        FiltPickMenu.REGISTER.register(modEventBus);
+        FiltPickMenu.REGISTER.register(MOD_EVENT_BUS);
     }
 
     private void registerMenuScreen(FMLClientSetupEvent event) {
