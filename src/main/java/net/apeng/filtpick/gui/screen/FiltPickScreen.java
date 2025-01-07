@@ -67,10 +67,17 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
         this.addRenderableWidget(scrollBlock);
     }
 
+    /**
+     *
+     * @param pMouseX
+     * @param pMouseY
+     * @param pDeltaX
+     * @param pDeltaY >0 means scrolling up; <0 means scrolling down
+     * @return
+     */
     @Override
     public boolean mouseScrolled(double pMouseX, double pMouseY, double pDeltaX, double pDeltaY) {
         if(!super.mouseScrolled(pMouseX, pMouseY, pDeltaX, pDeltaY)) {
-            scrollBlock.mouseScrolled(pMouseX, pMouseY, pDeltaX, pDeltaY);
             scrollMenu(pDeltaY);
         }
         return true;

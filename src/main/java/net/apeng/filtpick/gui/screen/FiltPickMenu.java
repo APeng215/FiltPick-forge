@@ -107,9 +107,6 @@ public class FiltPickMenu extends AbstractContainerMenu {
             for (int col = 0; col < 9; col++) {
                 int index = row * 9 + col + displayedRowOffset * 9;
                 if (index >= filtList.getContainerSize()) {
-                    FiltPick.LOGGER.warn(String.format("The size of displayed filtpick window (size: %d) is bigger than " +
-                            "actual filtpick container size of the player (size: %d). " +
-                            "Excess slots of the window won't be used.", FiltPick.CLIENT_CONFIG.FILTLIST_DISPLAYED_ROW_NUM.get() * 9, filtList.getContainerSize()));
                     return;
                 }
                 this.addSlot(new Slot(filtList, index, 8 + col * 18, 18 + row * 18));
