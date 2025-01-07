@@ -17,8 +17,9 @@ public class ScrollBlock extends AbstractWidget {
 
     /**
      * ScrollBar constructed by this method is active by default.
-     * @param pX x position of the scroll bar in its parent
-     * @param pY y position of the scroll bar in its parent
+     *
+     * @param pX               x position of the scroll bar in its parent
+     * @param pY               y position of the scroll bar in its parent
      * @param scrollSlotHeight the height of the slot in which the scroll bar scrolls.
      */
     public ScrollBlock(int pX, int pY, int scrollSlotHeight) {
@@ -29,11 +30,10 @@ public class ScrollBlock extends AbstractWidget {
     }
 
     /**
-     *
-     * @param pX x position of the scroll bar in its parent
-     * @param pY y position of the scroll bar in its parent
+     * @param pX               x position of the scroll bar in its parent
+     * @param pY               y position of the scroll bar in its parent
      * @param scrollSlotHeight the height of the slot in which the scroll bar scrolls.
-     * @param active if scroll block is active
+     * @param active           if scroll block is active
      */
     public ScrollBlock(int pX, int pY, int scrollSlotHeight, boolean active) {
         super(pX, pY, ScrollBlockResource.WIDTH, ScrollBlockResource.HEIGHT, Component.empty());
@@ -45,6 +45,7 @@ public class ScrollBlock extends AbstractWidget {
 
     /**
      * Render widget itself, excluding tooltip.
+     *
      * @param guiGraphics
      * @param pMouseX
      * @param pMouseY
@@ -52,20 +53,24 @@ public class ScrollBlock extends AbstractWidget {
      */
     @Override
     protected void renderWidget(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-        guiGraphics.blitSprite(
-                isActive() ? ScrollBlockResource.SPRITE_LOCATION : ScrollBlockResource.SPRITE_LOCATION_DISABLED,
-                getX(),
-                getY(),
-                ScrollBlockResource.WIDTH,
-                ScrollBlockResource.HEIGHT
-        );
+        if (isActive()) {
+            guiGraphics.blitSprite(
+                    ScrollBlockResource.SPRITE_LOCATION,
+                    getX(),
+                    getY(),
+                    ScrollBlockResource.WIDTH,
+                    ScrollBlockResource.HEIGHT
+            );
+        }
     }
 
     @Override
-    protected void updateWidgetNarration(NarrationElementOutput pNarrationElementOutput) {}
+    protected void updateWidgetNarration(NarrationElementOutput pNarrationElementOutput) {
+    }
 
     /**
      * Called when the mouse wheel is scrolled within the GUI element.
+     *
      * @param pMouseX the X coordinate of the mouse.
      * @param pMouseY the Y coordinate of the mouse.
      * @param pDeltaX the scrolling X delta.
@@ -75,14 +80,15 @@ public class ScrollBlock extends AbstractWidget {
     @Override
     public boolean mouseScrolled(double pMouseX, double pMouseY, double pDeltaX, double pDeltaY) {
         if (isActive()) {
-            setY(Mth.clamp(getY() - (int)(2 * pDeltaY), upBoundY, upBoundY + scrollSpaceY));
+            setY(Mth.clamp(getY() - (int) (2 * pDeltaY), upBoundY, upBoundY + scrollSpaceY));
             return true;
         }
-        return super.mouseScrolled(pMouseX, pMouseY, pDeltaX,pDeltaY);
+        return super.mouseScrolled(pMouseX, pMouseY, pDeltaX, pDeltaY);
     }
 
     /**
      * Called when a keyboard key is pressed within the GUI element.
+     *
      * @param pKeyCode   the key code of the pressed key.
      * @param pScanCode  the scan code of the pressed key.
      * @param pModifiers the keyboard modifiers.
@@ -105,7 +111,7 @@ public class ScrollBlock extends AbstractWidget {
     }
 
     protected void onDrag(double pMouseX, double pMouseY, double pDragX, double pDragY) {
-        setY(Mth.clamp((int)pMouseY - ScrollBlockResource.HEIGHT / 2, upBoundY, upBoundY + scrollSpaceY));
+        setY(Mth.clamp((int) pMouseY - ScrollBlockResource.HEIGHT / 2, upBoundY, upBoundY + scrollSpaceY));
     }
 
     /**
@@ -128,6 +134,7 @@ public class ScrollBlock extends AbstractWidget {
      * Returns how far the scroll block has slided from the start by ratio.
      * Will return 0 if the scroll block is at the start
      * or return 1 if the scroll is at the end.
+     *
      * @return
      */
     public double getPosRatio() {
@@ -137,6 +144,7 @@ public class ScrollBlock extends AbstractWidget {
 
     /**
      * Set scroll block position by ratio. If the ratio is or below 0, scroll block will be set to the start. Same to at and above 1.
+     *
      * @param ratio
      */
     public void setPosByRatio(double ratio) {
