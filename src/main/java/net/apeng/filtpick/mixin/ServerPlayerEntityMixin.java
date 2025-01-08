@@ -4,11 +4,13 @@ package net.apeng.filtpick.mixin;
 import com.mojang.authlib.GameProfile;
 import net.apeng.filtpick.FiltPick;
 import net.apeng.filtpick.gui.screen.FiltPickScreen;
+import net.apeng.filtpick.util.PlayerContainer;
 import net.apeng.filtpick.mixinduck.FiltListContainer;
 import net.apeng.filtpick.gui.util.ExtendedMenuProvider;
 import net.apeng.filtpick.property.FiltListPropertyDelegate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
@@ -35,7 +37,7 @@ public abstract class ServerPlayerEntityMixin extends Player implements FiltList
     @Shadow public abstract ServerLevel serverLevel();
 
     @Unique
-    private SimpleContainer filtList = new SimpleContainer(FiltPick.SERVER_CONFIG.CONTAINER_SIZE.get());
+    private SimpleContainer filtList = new PlayerContainer(FiltPick.SERVER_CONFIG.CONTAINER_SIZE.get());
 
     @Unique
     private FiltListPropertyDelegate filtListPropertyDelegate = new FiltListPropertyDelegate();
@@ -87,6 +89,10 @@ public abstract class ServerPlayerEntityMixin extends Player implements FiltList
         filtListPropertyDelegate.set(FiltPickScreen.DESTRUCTION_MODE_BUTTON_ID, nbt.getInt("isDestructionModeOn"));
     }
 
+    /**
+     * Check out {@link net.minecraft.world.entity.player.Inventory#save(ListTag)} for reference
+     * @param nbt
+     */
     @Unique
     private void writeFiltList(CompoundTag nbt) {
         nbt.put("FiltList", this.filtList.createTag(this.registryAccess()));
