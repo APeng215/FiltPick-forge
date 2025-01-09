@@ -58,11 +58,11 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
 
     private void addScrollBlock() {
         scrollBlock = new ContainerScrollBlock(
-                leftPos + imageWidth + 2,
-                topPos + 4,
-                110,
-                FiltPick.CLIENT_CONFIG.FILTLIST_DISPLAYED_ROW_NUM.get(),
-                FiltPick.SERVER_CONFIG.CONTAINER_SIZE.get() / 9
+                leftPos + imageWidth + 1,
+                topPos + 17,
+                FiltPick.CLIENT_CONFIG.FILTLIST_DISPLAYED_ROW_COUNT.get() * 18,
+                FiltPick.CLIENT_CONFIG.FILTLIST_DISPLAYED_ROW_COUNT.get(),
+                FiltPick.SERVER_CONFIG.CONTAINER_ROW_COUNT.get()
         );
         this.addRenderableWidget(scrollBlock);
     }
@@ -127,7 +127,7 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
 
 
     private void initCoordinates() {
-        this.imageHeight = 114 + FiltPick.CLIENT_CONFIG.FILTLIST_DISPLAYED_ROW_NUM.get() * 18;
+        this.imageHeight = 114 + FiltPick.CLIENT_CONFIG.FILTLIST_DISPLAYED_ROW_COUNT.get() * 18;
         this.inventoryLabelY = this.imageHeight - 94;
         this.leftPos = (this.width - this.imageWidth) / 2;
         this.topPos = (this.height - this.imageHeight) / 2;
@@ -255,11 +255,11 @@ public class FiltPickScreen extends AbstractContainerScreen<FiltPickMenu> {
     }
 
     private void renderInventory(GuiGraphics context) {
-        context.blit(CONTAINER_BACKGROUND, leftPos, topPos + FiltPick.CLIENT_CONFIG.FILTLIST_DISPLAYED_ROW_NUM.get() * 18 + 17, 0, 126, imageWidth, 96);
+        context.blit(CONTAINER_BACKGROUND, leftPos, topPos + FiltPick.CLIENT_CONFIG.FILTLIST_DISPLAYED_ROW_COUNT.get() * 18 + 17, 0, 126, imageWidth, 96);
     }
 
     private void renderFiltPickContainer(GuiGraphics context) {
-        context.blit(CONTAINER_BACKGROUND, leftPos, topPos, 0, 0, imageWidth, FiltPick.CLIENT_CONFIG.FILTLIST_DISPLAYED_ROW_NUM.get() * 18 + 17);
+        context.blit(CONTAINER_BACKGROUND, leftPos, topPos, 0, 0, imageWidth, FiltPick.CLIENT_CONFIG.FILTLIST_DISPLAYED_ROW_COUNT.get() * 18 + 17);
     }
 
     private void sendButtonClickC2SPacket(int buttonId) {
